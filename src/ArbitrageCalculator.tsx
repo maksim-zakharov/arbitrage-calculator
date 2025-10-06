@@ -27,7 +27,7 @@ export const AlorLabel = ({ symbol }) => {
 
   return (
       <div className="flex gap-1">
-        {key && <div className="img" style={{ backgroundImage: `url("//invest-brands.cdn-tinkoff.ru/${key}x160.png")` }}></div>}
+        {key && <div className="img" style={{ backgroundImage: `url("//invest-brands.cdn-tinkoff.ru/${key}x160.png")` }}/>}
         {symbol}
       </div>
   );
@@ -157,6 +157,7 @@ const PairCalculator = ({ group, onUpdate }) => {
                 onChange={(e) => handleChange(index, e.target.value)}
                 min="0"
                 step={index === 0 ? '1' : '0.01'} // Шаг для контрактов/лотов
+                  prefix={inst.name}
               />
             </label>
           ))}
@@ -204,7 +205,7 @@ const TripleCalculator = ({ group, onUpdate }) => {
         </CardTitle>
       </CardHeader>
       <CardContent className="p-2">
-        <div className="grid grid-cols-2 gap-4 mt-2 mb-2">
+        <div className="grid grid-cols-3 gap-4 mt-2 mb-2">
           {instruments.map((inst, index) => (
             <label key={index}>
               {inst.name}:
@@ -302,14 +303,22 @@ export const ArbitrageCalculator = () => {
   }, [groups]);
 
   return (
-    <div className="flex gap-2 flex-col pl-4 pr-4">
-      <div className="flex flex-wrap gap-6 pt-2 pb-2 md:flex-nowrap">
-        <span className="flex gap-1"><AlorLabel symbol="EUR"/> {moneyFormat(EURRate / 1000, 'RUB', 0, 2)}</span>
-        <span className="flex gap-1"><AlorLabel symbol="USD"/> {moneyFormat(USDRate / 1000, 'RUB', 0, 2)}</span>
-        <span className="flex gap-1"><AlorLabel symbol="CNY"/> {moneyFormat(CNYRate, 'RUB', 0, 2)}</span>
-        <span className="flex gap-1"><AlorLabel symbol="UCNY"/> {moneyFormat(USDRate / CNYRate / 1000, 'CNY', 0, 2)}</span>
-        <span className="flex gap-1"><AlorLabel symbol="EURUSD"/> {moneyFormat(EURRate / USDRate, 'USD', 0, 2)}</span>
-        <span className="flex gap-1"><AlorLabel symbol="EURCNY"/> {moneyFormat(EURRate / CNYRate / 1000, 'CNY', 0, 2)}</span>
+    <div className="flex gap-2 flex-col pl-4 pr-4 relative">
+      <div className="flex justify-between pt-2 pb-2">
+        <div className="flex flex-wrap gap-6 md:flex-nowrap">
+          <span className="flex gap-1"><AlorLabel symbol="EUR"/> {moneyFormat(EURRate / 1000, 'RUB', 0, 2)}</span>
+          <span className="flex gap-1"><AlorLabel symbol="USD"/> {moneyFormat(USDRate / 1000, 'RUB', 0, 2)}</span>
+          <span className="flex gap-1"><AlorLabel symbol="CNY"/> {moneyFormat(CNYRate, 'RUB', 0, 2)}</span>
+          <span className="flex gap-1"><AlorLabel
+              symbol="UCNY"/> {moneyFormat(USDRate / CNYRate / 1000, 'CNY', 0, 2)}</span>
+          <span className="flex gap-1"><AlorLabel symbol="EURUSD"/> {moneyFormat(EURRate / USDRate, 'USD', 0, 2)}</span>
+          <span className="flex gap-1"><AlorLabel
+              symbol="EURCNY"/> {moneyFormat(EURRate / CNYRate / 1000, 'CNY', 0, 2)}</span>
+        </div>
+        <a className="flex gap-1 bg-muted p-1 pl-2 pr-2 text-sm rounded-xl items-center" href="https://t.me/max89701" target="_blank">
+          <div className="img" style={{backgroundImage: `url("/assets/telegram-48px.png")`}}/>
+          Задать вопрос
+        </a>
       </div>
       <TypographyH2>Калькулятор лотности для арбитража</TypographyH2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
@@ -320,6 +329,9 @@ export const ArbitrageCalculator = () => {
             return <TripleCalculator key={group.id} group={group} onUpdate={updateGroup}/>;
           }
         })}
+      </div>
+      <div className="flex justify-center sticky bottom-0 mt-auto">
+        © 1995–{new Date().getFullYear()} Разработчик Максим Захаров
       </div>
     </div>
   );
