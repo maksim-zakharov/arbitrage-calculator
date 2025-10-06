@@ -1,27 +1,54 @@
 import React, {useEffect, useState} from 'react';
 import { Slider } from './components/ui/slider';
 import { Input } from './components/ui/input';
-import { TypographyH4 } from './components/ui/typography';
+import {TypographyH1, TypographyH2, TypographyH4} from './components/ui/typography';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import {useGetRuRateQuery} from "./api";
 import {moneyFormat} from "./utils";
 
+export const AlorLabel = ({ symbol }) => {
+  const map = {
+    GOLD: 'GoldFut2',
+    SILV: 'SilverFut',
+    PLD: 'Palladium',
+    PLT: 'Platinum',
+    UCNY: 'USDCNY',
+    CNY: 'CNYRUR',
+    SI: 'USD1',
+    USD: 'USD1',
+    ED: 'EURUSD3',
+    EURUSD: 'EURUSD3',
+    EUR: 'EUR1',
+    EU: 'EUR1',
+    RUB: 'ruble',
+  };
+
+  const key = map[symbol.split('-')[0]];
+
+  return (
+      <div className="flex gap-1">
+        {key && <div className="img" style={{ backgroundImage: `url("//invest-brands.cdn-tinkoff.ru/${key}x160.png")` }}></div>}
+        {symbol}
+      </div>
+  );
+};
+
 // Пример конфигурации: 8 пар и 4 тройки с коэффициентами (замените на реальные)
 const initialPairs = [
-  {
-    id: `UCNY-12.25/USDCNH_xp`,
-    type: 'pair',
-    instruments: [
-      { name: `UCNY-12.25`, value: 1, ratio: 1 }, // Базовый
-      { name: `USDCNH_xp`, value: 0.01, ratio: 0.01 },
-    ],
-  },
   {
     id: `ED-12.25/EURUSD_xp`,
     type: 'pair',
     instruments: [
       { name: `ED-12.25`, value: 1, ratio: 1 }, // Базовый
       { name: `EURUSD_xp`, value: 0.01, ratio: 0.01 },
+    ],
+  },
+  {
+    id: `UCNY-12.25/USDCNH_xp`,
+    type: 'pair',
+    instruments: [
+      { name: `UCNY-12.25`, value: 1, ratio: 1 }, // Базовый
+      { name: `USDCNH_xp`, value: 0.01, ratio: 0.01 },
     ],
   },
   {
@@ -46,6 +73,14 @@ const initialPairs = [
     instruments: [
       { name: `PLT-12.25`, value: 1, ratio: 1 }, // Базовый
       { name: `XPTUSD_xp`, value: 0.01, ratio: 0.01 },
+    ],
+  },
+  {
+    id: `PLD-12.25/XPDUSD_xp`,
+    type: 'pair',
+    instruments: [
+      { name: `PLD-12.25`, value: 1, ratio: 1 }, // Базовый
+      { name: `XPDUSD_xp`, value: 0.01, ratio: 0.01 },
     ],
   },
 ];
@@ -108,7 +143,7 @@ const PairCalculator = ({ group, onUpdate }) => {
     <Card className="gap-1 p-2">
       <CardHeader className="pl-2 pt-3">
         <CardTitle>
-          <TypographyH4>{group.id}</TypographyH4>
+          <TypographyH4><AlorLabel symbol={group.id}/></TypographyH4>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-2">
@@ -165,7 +200,7 @@ const TripleCalculator = ({ group, onUpdate }) => {
     <Card className="gap-1 p-2">
       <CardHeader className="pl-2 pt-3">
         <CardTitle>
-          <TypographyH4>{group.id}</TypographyH4>
+          <TypographyH4><AlorLabel symbol={group.id}/></TypographyH4>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-2">
@@ -219,21 +254,22 @@ export const ArbitrageCalculator = () => {
   }, [groups]);
 
   return (
-    <div className="flex gap-2 flex-col">
-      Курсы валют
-      <span>EUR: {moneyFormat(EURRate, 'RUB', 0, 2)}</span>
-      <span>USD: {moneyFormat(USDRate, 'RUB', 0, 2)}</span>
-      <span>CNY: {moneyFormat(CNYRate, 'RUB', 0, 2)}</span>
-      <span>UCNY: {moneyFormat(USDRate / CNYRate, 'CNY', 0, 2)}</span>
-      <span>EURUSD: {moneyFormat(EURRate / USDRate, 'USD', 0, 2)}</span>
-      <span>EURCNY: {moneyFormat(EURRate / CNYRate, 'CNY', 0, 2)}</span>
-      <h1>Калькулятор лотности для арбитража</h1>
+    <div className="flex gap-2 flex-col pl-4 pr-4">
+      <div className="flex gap-6 pt-2 pb-2">
+        <span className="flex gap-1"><AlorLabel symbol="EUR"/> {moneyFormat(EURRate, 'RUB', 0, 2)}</span>
+        <span className="flex gap-1"><AlorLabel symbol="USD"/> {moneyFormat(USDRate, 'RUB', 0, 2)}</span>
+        <span className="flex gap-1"><AlorLabel symbol="CNY"/> {moneyFormat(CNYRate, 'RUB', 0, 2)}</span>
+        <span className="flex gap-1"><AlorLabel symbol="UCNY"/> {moneyFormat(USDRate / CNYRate, 'CNY', 0, 2)}</span>
+        <span className="flex gap-1"><AlorLabel symbol="EURUSD"/> {moneyFormat(EURRate / USDRate, 'USD', 0, 2)}</span>
+        <span className="flex gap-1"><AlorLabel symbol="EURCNY"/> {moneyFormat(EURRate / CNYRate, 'CNY', 0, 2)}</span>
+      </div>
+      <TypographyH2>Калькулятор лотности для арбитража</TypographyH2>
       <div className="flex flex-wrap gap-2 flex-row">
         {groups.map((group) => {
           if (group.type === 'pair') {
-            return <PairCalculator key={group.id} group={group} onUpdate={updateGroup} />;
+            return <PairCalculator key={group.id} group={group} onUpdate={updateGroup}/>;
           } else {
-            return <TripleCalculator key={group.id} group={group} onUpdate={updateGroup} />;
+            return <TripleCalculator key={group.id} group={group} onUpdate={updateGroup}/>;
           }
         })}
       </div>
