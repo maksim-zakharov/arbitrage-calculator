@@ -26,3 +26,38 @@ export const moneyFormat = (
 
     return result;
 };
+
+function getThirdThursday(year, month) {
+    let date = new Date(year, month - 1, 1);
+    let thursdays = 0;
+    while (thursdays < 3) {
+        if (date.getDay() === 4) { // Thursday
+            thursdays++;
+        }
+        if (thursdays < 3) {
+            date.setDate(date.getDate() + 1);
+        }
+    }
+    return date;
+}
+
+export function getFuturesSuffix() {
+    const now = new Date();
+    let year = now.getFullYear();
+    let month = now.getMonth() + 1;
+    const quarterEnd = Math.ceil(month / 3) * 3;
+    let expMonth = quarterEnd;
+    let expYear = year;
+    const expDate = getThirdThursday(expYear, expMonth);
+    if (now > expDate) {
+        expMonth += 3;
+        if (expMonth > 12) {
+            expMonth -= 12;
+            expYear += 1;
+        }
+    }
+    const letterMap = { 3: 'H', 6: 'M', 9: 'U', 12: 'Z' };
+    const letter = letterMap[expMonth];
+    const yearDigit = expYear % 10;
+    return letter + yearDigit;
+}

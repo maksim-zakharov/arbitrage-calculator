@@ -4,7 +4,7 @@ import { Input } from './components/ui/input';
 import {TypographyH1, TypographyH2, TypographyH4} from './components/ui/typography';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import {useGetMoexSecurityQuery, useGetRuRateQuery} from "./api";
-import {moneyFormat} from "./utils";
+import {getFuturesSuffix, moneyFormat} from "./utils";
 
 export const AlorLabel = ({ symbol }) => {
   const map = {
@@ -36,50 +36,50 @@ export const AlorLabel = ({ symbol }) => {
 // Пример конфигурации: 8 пар и 4 тройки с коэффициентами (замените на реальные)
 const initialPairs = [
   {
-    id: `ED-12.25/EURUSD_xp`,
+    id: `ED/EURUSD_xp`,
     type: 'pair',
     instruments: [
-      { name: `ED-12.25`, value: 1, ratio: 1 }, // Базовый
+      { name: `ED`, value: 1, ratio: 1 }, // Базовый
       { name: `EURUSD_xp`, value: 0.01, ratio: 0.01 },
     ],
   },
   {
-    id: `UCNY-12.25/USDCNH_xp`,
+    id: `UCNY/USDCNH_xp`,
     type: 'pair',
     instruments: [
-      { name: `UCNY-12.25`, value: 1, ratio: 1 }, // Базовый
+      { name: `UCNY`, value: 1, ratio: 1 }, // Базовый
       { name: `USDCNH_xp`, value: 0.01, ratio: 0.01 },
     ],
   },
   {
-    id: `GOLD-12.25/XAUUSD_xp`,
+    id: `GOLD/XAUUSD_xp`,
     type: 'pair',
     instruments: [
-      { name: `GOLD-12.25`, value: 1, ratio: 1 }, // Базовый
+      { name: `GOLD`, value: 1, ratio: 1 }, // Базовый
       { name: `XAUUSD_xp`, value: 0.01, ratio: 0.01 },
     ],
   },
   {
-    id: `SILV-12.25/XAGUSD_xp`,
+    id: `SILV/XAGUSD_xp`,
     type: 'pair',
     instruments: [
-      { name: `SILV-12.25`, value: 5, ratio: 1 }, // Базовый
+      { name: `SILV`, value: 5, ratio: 1 }, // Базовый
       { name: `XAGUSD_xp`, value: 0.01, ratio: 0.002 },
     ],
   },
   {
-    id: `PLT-12.25/XPTUSD_xp`,
+    id: `PLT/XPTUSD_xp`,
     type: 'pair',
     instruments: [
-      { name: `PLT-12.25`, value: 1, ratio: 1 }, // Базовый
+      { name: `PLT`, value: 1, ratio: 1 }, // Базовый
       { name: `XPTUSD_xp`, value: 0.01, ratio: 0.01 },
     ],
   },
   {
-    id: `PLD-12.25/XPDUSD_xp`,
+    id: `PLD/XPDUSD_xp`,
     type: 'pair',
     instruments: [
-      { name: `PLD-12.25`, value: 1, ratio: 1 }, // Базовый
+      { name: `PLD`, value: 1, ratio: 1 }, // Базовый
       { name: `XPDUSD_xp`, value: 0.01, ratio: 0.01 },
     ],
   },
@@ -87,29 +87,29 @@ const initialPairs = [
 
 const initialTriples = [
   {
-    id: `SI-12.25/CNY-12.25/USDCNH_xp`,
+    id: `SI/CNY/USDCNH_xp`,
     type: 'triple',
     instruments: [
-      { name: `SI-12.25`, value: 24, ratio: 1 }, // Базовый
-      { name: `CNY-12.25`, value: 170, ratio: 7.08 }, // ratio зависит от курса Юаня
+      { name: `SI`, value: 24, ratio: 1 }, // Базовый
+      { name: `CNY`, value: 170, ratio: 7.08 }, // ratio зависит от курса Юаня
       { name: `USDCNH_xp`, value: 0.24, ratio: 0.01 }, // Пример третьего
     ],
   },
   {
-    id: `EU-12.25/SI-12.25/EURUSD_xp`,
+    id: `EU/SI/EURUSD_xp`,
     type: 'triple',
     instruments: [
-      { name: `EU-12.25`, value: 20, ratio: 1 }, // Базовый
-      { name: `SI-12.25`, value: 23, ratio: 1.15 }, // ratio зависит от курса Евро
+      { name: `EU`, value: 20, ratio: 1 }, // Базовый
+      { name: `SI`, value: 23, ratio: 1.15 }, // ratio зависит от курса Евро
       { name: `EURUSD_xp`, value: 0.2, ratio: 0.01 }, // Пример третьего
     ],
   },
   {
-    id: `EU-12.25/CNY-12.25/EURCNH_xp`,
+    id: `EU/CNY/EURCNH_xp`,
     type: 'triple',
     instruments: [
-      { name: `EU-12.25`, value: 1, ratio: 1 }, // Базовый
-      { name: `CNY-12.25`, value: 8, ratio: 8 }, // ratio зависит от курса Евро и юаня
+      { name: `EU`, value: 1, ratio: 1 }, // Базовый
+      { name: `CNY`, value: 8, ratio: 8 }, // ratio зависит от курса Евро и юаня
       { name: `EURCNH_xp`, value: 0.01, ratio: 0.01 }, // Пример третьего
     ],
   },
@@ -231,14 +231,15 @@ const TripleCalculator = ({ group, onUpdate }) => {
 };
 
 export const ArbitrageCalculator = () => {
+  const suffix = getFuturesSuffix();
   const { data: rateData } = useGetRuRateQuery();
-  const {data: EURRate} = useGetMoexSecurityQuery('EUZ5', {
+  const {data: EURRate} = useGetMoexSecurityQuery(`EU${suffix}`, {
     pollingInterval: 5000
   })
-  const {data: USDRate} = useGetMoexSecurityQuery('SiZ5', {
+  const {data: USDRate} = useGetMoexSecurityQuery(`Si${suffix}`, {
     pollingInterval: 5000
   })
-  const {data: CNYRate} = useGetMoexSecurityQuery('CRZ5', {
+  const {data: CNYRate} = useGetMoexSecurityQuery(`CR${suffix}`, {
     pollingInterval: 5000
   })
   // const EURRate = rateData?.Valute.EUR.Value;
@@ -266,13 +267,13 @@ export const ArbitrageCalculator = () => {
           let newInstruments = [...group.instruments];
           let updated = false;
 
-          if (group.id === `SI-12.25/CNY-12.25/USDCNH_xp`) {
+          if (group.id === `SI/CNY/USDCNH_xp`) {
             newInstruments[1].ratio = usdCny;
             updated = true;
-          } else if (group.id === `EU-12.25/SI-12.25/EURUSD_xp`) {
+          } else if (group.id === `EU/SI/EURUSD_xp`) {
             newInstruments[1].ratio = eurUsd;
             updated = true;
-          } else if (group.id === `EU-12.25/CNY-12.25/EURCNH_xp`) {
+          } else if (group.id === `EU/CNY/EURCNH_xp`) {
             newInstruments[1].ratio = eurCny;
             updated = true;
           }
