@@ -23,7 +23,7 @@ export const AlorLabel = ({ symbol }) => {
     RUB: 'ruble',
   };
 
-  const key = map[symbol.split('-')[0]];
+  const key = map[(symbol.includes('-') ? symbol.split('-') : symbol.split('/'))[0]];
 
   return (
       <div className="flex gap-1">
