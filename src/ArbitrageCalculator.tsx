@@ -255,7 +255,7 @@ export const ArbitrageCalculator = () => {
 
   return (
     <div className="flex gap-2 flex-col pl-4 pr-4">
-      <div className="flex gap-6 pt-2 pb-2">
+      <div className="flex flex-wrap gap-6 pt-2 pb-2 md:flex-nowrap">
         <span className="flex gap-1"><AlorLabel symbol="EUR"/> {moneyFormat(EURRate, 'RUB', 0, 2)}</span>
         <span className="flex gap-1"><AlorLabel symbol="USD"/> {moneyFormat(USDRate, 'RUB', 0, 2)}</span>
         <span className="flex gap-1"><AlorLabel symbol="CNY"/> {moneyFormat(CNYRate, 'RUB', 0, 2)}</span>
@@ -264,7 +264,7 @@ export const ArbitrageCalculator = () => {
         <span className="flex gap-1"><AlorLabel symbol="EURCNY"/> {moneyFormat(EURRate / CNYRate, 'CNY', 0, 2)}</span>
       </div>
       <TypographyH2>Калькулятор лотности для арбитража</TypographyH2>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
         {groups.map((group) => {
           if (group.type === 'pair') {
             return <PairCalculator key={group.id} group={group} onUpdate={updateGroup}/>;
