@@ -128,7 +128,7 @@ const PairCalculator = ({ group, onUpdate }) => {
         </div>
         <Slider
           className="pt-2 pb-2"
-          defaultValue={[instruments[0].value]}
+          value={[instruments[0].value]}
           onValueChange={(val) => handleChange(0, val)}
           max={500}
           step={1}
@@ -185,7 +185,7 @@ const TripleCalculator = ({ group, onUpdate }) => {
         </div>
         <Slider
           className="pt-2 pb-2"
-          defaultValue={[instruments[0].value]}
+          value={[instruments[0].value]}
           onValueChange={(val) => handleChange(0, val)}
           max={500}
           step={1}
