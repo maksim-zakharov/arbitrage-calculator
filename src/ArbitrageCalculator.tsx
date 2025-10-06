@@ -303,9 +303,9 @@ export const ArbitrageCalculator = () => {
   }, [groups]);
 
   return (
-    <div className="flex gap-2 flex-col pl-4 pr-4 relative">
-      <div className="flex justify-between pt-2 pb-2">
-        <div className="flex flex-wrap gap-6 md:flex-nowrap">
+    <div className="flex gap-2 flex-col pl-4 pr-4 h-screen">
+      <div className="flex flex-wrap justify-between pt-2 pb-2">
+        <div className="grid grid-cols-2 gap-6 md:flex md:flex-nowrap">
           <span className="flex gap-1"><AlorLabel symbol="EUR"/> {moneyFormat(EURRate / 1000, 'RUB', 0, 2)}</span>
           <span className="flex gap-1"><AlorLabel symbol="USD"/> {moneyFormat(USDRate / 1000, 'RUB', 0, 2)}</span>
           <span className="flex gap-1"><AlorLabel symbol="CNY"/> {moneyFormat(CNYRate, 'RUB', 0, 2)}</span>
@@ -329,9 +329,6 @@ export const ArbitrageCalculator = () => {
             return <TripleCalculator key={group.id} group={group} onUpdate={updateGroup}/>;
           }
         })}
-      </div>
-      <div className="flex justify-center sticky bottom-0 mt-auto">
-        © 1995–{new Date().getFullYear()} Разработчик Максим Захаров
       </div>
     </div>
   );
