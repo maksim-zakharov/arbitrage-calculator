@@ -3,7 +3,7 @@ import { Slider } from './components/ui/slider';
 import { Input } from './components/ui/input';
 import {TypographyH1, TypographyH2, TypographyH4} from './components/ui/typography';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
-import {useGetRuRateQuery} from "./api";
+import {useGetMoexSecurityQuery, useGetRuRateQuery} from "./api";
 import {moneyFormat} from "./utils";
 
 export const AlorLabel = ({ symbol }) => {
@@ -232,9 +232,18 @@ const TripleCalculator = ({ group, onUpdate }) => {
 
 export const ArbitrageCalculator = () => {
   const { data: rateData } = useGetRuRateQuery();
-  const EURRate = rateData?.Valute.EUR.Value;
-  const USDRate = rateData?.Valute.USD.Value;
-  const CNYRate = rateData?.Valute.CNY.Value;
+  const {data: EURRate} = useGetMoexSecurityQuery('EUZ5', {
+    pollingInterval: 5000
+  })
+  const {data: USDRate} = useGetMoexSecurityQuery('SiZ5', {
+    pollingInterval: 5000
+  })
+  const {data: CNYRate} = useGetMoexSecurityQuery('CRZ5', {
+    pollingInterval: 5000
+  })
+  // const EURRate = rateData?.Valute.EUR.Value;
+  // const USDRate = rateData?.Valute.USD.Value;
+  // const CNYRate = rateData?.Valute.CNY.Value;
 
   const [groups, setGroups] = useState(() => {
     const saved = localStorage.getItem('arbitrageGroups');
@@ -246,11 +255,11 @@ export const ArbitrageCalculator = () => {
   };
 
   useEffect(() => {
-    if (!rateData) return;
+    if (!rateData || !USDRate || !CNYRate || !EURRate) return;
 
-    const usdCny = USDRate / CNYRate;
+    const usdCny = USDRate / CNYRate / 1000;
     const eurUsd = EURRate / USDRate;
-    const eurCny = EURRate / CNYRate;
+    const eurCny = EURRate / CNYRate / 1000;
 
     setGroups((prev) =>
         prev.map((group) => {
@@ -281,7 +290,7 @@ export const ArbitrageCalculator = () => {
           return updated ? { ...group, instruments: newInstruments } : group;
         })
     );
-  }, [rateData]);
+  }, [rateData, EURRate, USDRate, CNYRate]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -294,12 +303,12 @@ export const ArbitrageCalculator = () => {
   return (
     <div className="flex gap-2 flex-col pl-4 pr-4">
       <div className="flex flex-wrap gap-6 pt-2 pb-2 md:flex-nowrap">
-        <span className="flex gap-1"><AlorLabel symbol="EUR"/> {moneyFormat(EURRate, 'RUB', 0, 2)}</span>
-        <span className="flex gap-1"><AlorLabel symbol="USD"/> {moneyFormat(USDRate, 'RUB', 0, 2)}</span>
+        <span className="flex gap-1"><AlorLabel symbol="EUR"/> {moneyFormat(EURRate / 1000, 'RUB', 0, 2)}</span>
+        <span className="flex gap-1"><AlorLabel symbol="USD"/> {moneyFormat(USDRate / 1000, 'RUB', 0, 2)}</span>
         <span className="flex gap-1"><AlorLabel symbol="CNY"/> {moneyFormat(CNYRate, 'RUB', 0, 2)}</span>
-        <span className="flex gap-1"><AlorLabel symbol="UCNY"/> {moneyFormat(USDRate / CNYRate, 'CNY', 0, 2)}</span>
+        <span className="flex gap-1"><AlorLabel symbol="UCNY"/> {moneyFormat(USDRate / CNYRate / 1000, 'CNY', 0, 2)}</span>
         <span className="flex gap-1"><AlorLabel symbol="EURUSD"/> {moneyFormat(EURRate / USDRate, 'USD', 0, 2)}</span>
-        <span className="flex gap-1"><AlorLabel symbol="EURCNY"/> {moneyFormat(EURRate / CNYRate, 'CNY', 0, 2)}</span>
+        <span className="flex gap-1"><AlorLabel symbol="EURCNY"/> {moneyFormat(EURRate / CNYRate / 1000, 'CNY', 0, 2)}</span>
       </div>
       <TypographyH2>Калькулятор лотности для арбитража</TypographyH2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
