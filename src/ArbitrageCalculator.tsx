@@ -264,7 +264,7 @@ export const ArbitrageCalculator = () => {
         <span className="flex gap-1"><AlorLabel symbol="EURCNY"/> {moneyFormat(EURRate / CNYRate, 'CNY', 0, 2)}</span>
       </div>
       <TypographyH2>Калькулятор лотности для арбитража</TypographyH2>
-      <div className="flex flex-wrap gap-2 flex-row">
+      <div className="grid grid-cols-3 gap-2">
         {groups.map((group) => {
           if (group.type === 'pair') {
             return <PairCalculator key={group.id} group={group} onUpdate={updateGroup}/>;
