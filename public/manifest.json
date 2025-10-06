@@ -1,0 +1,48 @@
+{
+  "short_name": "Арбитражный калькулятор",
+  "name": "Арбитражный калькулятор",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "intent_filters": {
+    "scope_url_scheme": "https",
+    "scope_url_host": "maksim-zakharov.github.io",
+    "scope_url_path": "/arbitrage-calculator"
+  },
+  "scope": "/",
+  "handle_links": "preferred",
+  "start_url": "/arbitrage-calculator/#/diary",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#000000",
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://maksim-zakharov.github.io/arbitrage-calculator/manifest.json"
+    }
+  ],
+  "capture_links": "existing_client_event",
+  "shortcuts": [],
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "url_handlers": [
+    {
+      "origin": "https://maksim-zakharov.github.io"
+    }
+  ]
+}
