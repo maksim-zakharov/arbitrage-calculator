@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { Slider } from './components/ui/slider';
 import { Input } from './components/ui/input';
 import { TypographyH4 } from './components/ui/typography';
@@ -201,11 +201,22 @@ export const ArbitrageCalculator = () => {
   const USDRate = rateData?.Valute.USD.Value;
   const CNYRate = rateData?.Valute.CNY.Value;
 
-  const [groups, setGroups] = useState([...initialPairs, ...initialTriples]);
+  const [groups, setGroups] = useState(() => {
+    const saved = localStorage.getItem('arbitrageGroups');
+    return saved ? JSON.parse(saved) : [...initialPairs, ...initialTriples];
+  });
 
   const updateGroup = (groupId, updatedInstruments) => {
     setGroups(groups.map((group) => (group.id === groupId ? { ...group, instruments: updatedInstruments } : group)));
   };
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      localStorage.setItem('arbitrageGroups', JSON.stringify(groups));
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [groups]);
 
   return (
     <div className="flex gap-2 flex-col">
