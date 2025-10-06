@@ -246,6 +246,44 @@ export const ArbitrageCalculator = () => {
   };
 
   useEffect(() => {
+    if (!rateData) return;
+
+    const usdCny = USDRate / CNYRate;
+    const eurUsd = EURRate / USDRate;
+    const eurCny = EURRate / CNYRate;
+
+    setGroups((prev) =>
+        prev.map((group) => {
+          let newInstruments = [...group.instruments];
+          let updated = false;
+
+          if (group.id === `SI-12.25/CNY-12.25/USDCNH_xp`) {
+            newInstruments[1].ratio = usdCny;
+            updated = true;
+          } else if (group.id === `EU-12.25/SI-12.25/EURUSD_xp`) {
+            newInstruments[1].ratio = eurUsd;
+            updated = true;
+          } else if (group.id === `EU-12.25/CNY-12.25/EURCNH_xp`) {
+            newInstruments[1].ratio = eurCny;
+            updated = true;
+          }
+
+          if (updated) {
+            const baseValue = newInstruments[0].value;
+            const baseRatio = newInstruments[0].ratio;
+            newInstruments.forEach((inst, i) => {
+              if (i !== 0) {
+                inst.value = Math.round(baseValue * (inst.ratio / baseRatio) * 1000) / 1000;
+              }
+            });
+          }
+
+          return updated ? { ...group, instruments: newInstruments } : group;
+        })
+    );
+  }, [rateData]);
+
+  useEffect(() => {
     const timeout = setTimeout(() => {
       localStorage.setItem('arbitrageGroups', JSON.stringify(groups));
     }, 500);
