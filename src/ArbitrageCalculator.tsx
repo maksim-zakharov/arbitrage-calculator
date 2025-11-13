@@ -24,7 +24,7 @@ export const AlorLabel = ({ symbol }) => {
   };
 
   const bybitMap = {
-    PAXGUSDT: 'https://www.bybit.com/bycsi-root/fop/a8286509-8373-4307-852e-8cbacca2c299.svg'
+    PAXGUSDT: 'url("//bybit.com/bycsi-root/fop/a8286509-8373-4307-852e-8cbacca2c299.svg")'
   }
 
   const symbolParts = (symbol.includes('-') ? symbol.split('-') : symbol.split('/'));
