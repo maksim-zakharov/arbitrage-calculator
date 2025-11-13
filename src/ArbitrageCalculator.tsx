@@ -23,11 +23,22 @@ export const AlorLabel = ({ symbol }) => {
     RUB: 'ruble',
   };
 
-  const key = map[(symbol.includes('-') ? symbol.split('-') : symbol.split('/'))[0]];
+  const bybitMap = {
+    PAXGUSDT: 'https://www.bybit.com/bycsi-root/fop/a8286509-8373-4307-852e-8cbacca2c299.svg'
+  }
+
+  const symbolParts = (symbol.includes('-') ? symbol.split('-') : symbol.split('/'));
+
+  let key = map[symbolParts[0]];
+  let backgroundImage = `url("//invest-brands.cdn-tinkoff.ru/${key}x160.png")`
+  if(symbolParts[1].includes('BYBIT')){
+    const [exchange, ticker] = symbolParts[1].split(':')
+    backgroundImage = bybitMap[ticker];
+  }
 
   return (
       <div className="flex gap-1">
-        {key && <div className="img" style={{ backgroundImage: `url("//invest-brands.cdn-tinkoff.ru/${key}x160.png")` }}/>}
+        {key && <div className="img" style={{ backgroundImage }}/>}
         {symbol}
       </div>
   );
@@ -57,6 +68,14 @@ const initialPairs = [
     instruments: [
       { name: `GOLD`, value: 1, ratio: 1 }, // Базовый
       { name: `XAUUSD_xp`, value: 0.01, ratio: 0.01 },
+    ],
+  },
+  {
+    id: `GOLD/BYBIT:PAXGUSDT`,
+    type: 'pair',
+    instruments: [
+      { name: `GOLD`, value: 1, ratio: 1 }, // Базовый
+      { name: `BYBIT:PAXGUSDT`, value: 1, ratio: 1 },
     ],
   },
   {
