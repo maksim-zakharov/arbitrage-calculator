@@ -31,7 +31,7 @@ export const AlorLabel = ({ symbol }) => {
 
   let key = map[symbolParts[0]];
   let backgroundImage = `url("//invest-brands.cdn-tinkoff.ru/${key}x160.png")`
-  if(symbolParts[1].includes('BYBIT')){
+  if(symbolParts[1]?.includes('BYBIT')){
     const [exchange, ticker] = symbolParts[1].split(':')
     backgroundImage = bybitMap[ticker];
   }
