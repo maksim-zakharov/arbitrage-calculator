@@ -21,6 +21,8 @@ export const AlorLabel = ({ symbol }) => {
     EUR: 'EUR1',
     EU: 'EUR1',
     RUB: 'ruble',
+    ETH: 'Ethereumx160',
+    BTC: 'BITOKx160'
   };
 
   const bybitMap = {
@@ -100,6 +102,22 @@ const initialPairs = [
     instruments: [
       { name: `PLD`, value: 1, ratio: 1 }, // Базовый
       { name: `XPDUSD_xp`, value: 0.01, ratio: 0.01 },
+    ],
+  },
+  {
+    id: `BTC/BTCUSD_xp`,
+    type: 'pair',
+    instruments: [
+      { name: `BTC`, value: 10, ratio: 10 },
+      { name: `BTCUSD_xp`, value: 0.01, ratio: 0.01 },
+    ],
+  },
+  {
+    id: `ETH/ETHUSD_xp`,
+    type: 'pair',
+    instruments: [
+      { name: `ETH`, value: 12, ratio: 12 },
+      { name: `ETHUSD_xp`, value: 0.01, ratio: 0.01 },
     ],
   },
 ];
