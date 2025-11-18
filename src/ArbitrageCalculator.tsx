@@ -362,7 +362,7 @@ export const ArbitrageCalculator = () => {
           Задать вопрос
         </a>
       </div>
-      <div>
+      <div className="flex gap-2">
         <TypographyH2>Калькулятор лотности для арбитража</TypographyH2>
         <div onClick={update}>Обновить</div>
         <div className="flex gap-1 bg-muted p-1 pl-2 pr-2 text-sm rounded-xl items-center" onClick={update}>Обновить
