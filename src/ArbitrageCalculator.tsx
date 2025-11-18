@@ -21,8 +21,8 @@ export const AlorLabel = ({ symbol }) => {
     EUR: 'EUR1',
     EU: 'EUR1',
     RUB: 'ruble',
-    ETH: 'Ethereumx160',
-    BTC: 'BITOKx160'
+    ETH: 'Ethereum',
+    BTC: 'BITOK'
   };
 
   const bybitMap = {
