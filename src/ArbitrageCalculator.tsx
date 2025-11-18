@@ -293,6 +293,11 @@ export const ArbitrageCalculator = () => {
     setGroups(groups.map((group) => (group.id === groupId ? { ...group, instruments: updatedInstruments } : group)));
   };
 
+  const update = () => {
+    localStorage.removeItem('arbitrageGroups');
+    window.location.reload();
+  }
+
   useEffect(() => {
     if (!rateData || !USDRate || !CNYRate || !EURRate) return;
 
@@ -357,7 +362,12 @@ export const ArbitrageCalculator = () => {
           Задать вопрос
         </a>
       </div>
-      <TypographyH2>Калькулятор лотности для арбитража</TypographyH2>
+      <div>
+        <TypographyH2>Калькулятор лотности для арбитража</TypographyH2>
+        <div onClick={update}>Обновить</div>
+        <div className="flex gap-1 bg-muted p-1 pl-2 pr-2 text-sm rounded-xl items-center" onClick={update}>Обновить
+        </div>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
         {groups.map((group) => {
           if (group.type === 'pair') {
