@@ -282,6 +282,7 @@ export const ArbitrageCalculator = () => {
     const {data: CNYRate} = useGetMoexSecurityQuery(`CR${suffix}`, {
         pollingInterval: 5000
     })
+
     // const EURRate = rateData?.Valute.EUR.Value;
     // const USDRate = rateData?.Valute.USD.Value;
     // const CNYRate = rateData?.Valute.CNY.Value;
