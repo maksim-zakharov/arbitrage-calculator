@@ -386,11 +386,6 @@ export const ArbitrageCalculator = () => {
                     </Button>
                 </a>
             </Alert>
-            <div className="">
-                Хотите точные графики арбитража из XPBEE бесплатно или за подписку? <br/>Пройдите быстрый опрос (2 мин)
-                и
-                помогите улучшить калькулятор!
-            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                 {groups.map((group) => {
                     if (group.type === 'pair') {
