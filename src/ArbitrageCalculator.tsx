@@ -363,6 +363,14 @@ export const ArbitrageCalculator = () => {
                     <span className="flex gap-1"><AlorLabel
                         symbol="EURCNY"/> {moneyFormat(EURRate / CNYRate / 1000, 'CNY', 0, 2)}</span>
                 </div>
+                <a
+                    className="flex gap-1 bg-muted p-1 pl-2 pr-2 text-sm rounded-xl items-center"
+                    href="https://crypto-spreads.ru/arbs-moex-cex?utm_source=calculator&utm_medium=link&utm_campaign=xpbee"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Котировки XPBEE с графиками TradingView
+                </a>
                 <a className="flex gap-1 bg-muted p-1 pl-2 pr-2 text-sm rounded-xl items-center"
                    href="https://t.me/max89701" target="_blank">
                     <div className="img" style={{backgroundImage: `url("/assets/telegram-48px.png")`}}/>
