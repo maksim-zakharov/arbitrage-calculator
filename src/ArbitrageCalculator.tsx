@@ -159,7 +159,7 @@ const initialTriples = [
         instruments: [
             {name: `GLDRUBF`, value: 31.1, ratio: 1}, // Базовый
             {name: `SI`, value: 0, ratio: 0}, // ratio = цена GOLD-3.26 / 1000 (обновляется из котировок)
-            {name: `GOLD`, value: 1, ratio: 1 / 31.1},
+            {name: `GOLD`, value: 1 / 31.1, ratio: 1 / 31.1}, // GOLD = 1/31.1 при GLDRUBF=31.1
         ],
     },
 ];
@@ -338,7 +338,8 @@ export const ArbitrageCalculator = () => {
                     newInstruments[1].ratio = eurCny;
                     updated = true;
                 } else if (group.id === `GLDRUBF/SI/GOLD` && GOLDRate != null) {
-                    newInstruments[1].ratio = GOLDRate / 1000; // SI = цена GOLD-3.26 / 1000
+                    const goldPrice = GOLDRate / 1000;
+                    newInstruments[1].ratio = goldPrice / (31.1 * 31.1); // SI = (цена GOLD / 1000) / 31.1
                     updated = true;
                 }
 
@@ -381,7 +382,7 @@ export const ArbitrageCalculator = () => {
                     <span className="flex gap-1"><AlorLabel
                         symbol="EURCNY"/> {moneyFormat(EURRate / CNYRate / 1000, 'CNY', 0, 2)}</span>
                     <span className="flex gap-1"><AlorLabel
-                        symbol="GOLD"/> {GOLDRate != null ? moneyFormat(GOLDRate / 1000, 'RUB', 0, 2) : '—'}</span>
+                        symbol="GOLD"/> {GOLDRate != null ? moneyFormat(GOLDRate, 'USD', 0, 2) : '—'}</span>
                 </div>
                 <a
                     className="flex gap-1 bg-muted p-1 pl-2 pr-2 text-sm rounded-xl items-center"
