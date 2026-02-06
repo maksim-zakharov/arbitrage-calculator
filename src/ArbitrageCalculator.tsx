@@ -11,6 +11,7 @@ import {Button} from "./components/ui/button";
 export const AlorLabel = ({symbol}) => {
     const map = {
         GOLD: 'GoldFut2',
+        GLDRUBF: 'GoldFut2',
         SILV: 'SilverFut',
         PLD: 'Palladium',
         PLT: 'Platinum',
@@ -152,6 +153,15 @@ const initialTriples = [
             {name: `EURCNH_xp`, value: 0.01, ratio: 0.01}, // Пример третьего
         ],
     },
+    {
+        id: `GLDRUBF/SI/GOLD`,
+        type: 'triple',
+        instruments: [
+            {name: `GLDRUBF`, value: 31.1, ratio: 1}, // Базовый
+            {name: `SI`, value: 0, ratio: 0}, // ratio = цена GOLD-3.26 / 1000 (обновляется из котировок)
+            {name: `GOLD`, value: 1, ratio: 1 / 31.1},
+        ],
+    },
 ];
 
 // Компонент для пары
@@ -282,6 +292,9 @@ export const ArbitrageCalculator = () => {
     const {data: CNYRate} = useGetMoexSecurityQuery(`CR${suffix}`, {
         pollingInterval: 5000
     })
+    const {data: GOLDRate} = useGetMoexSecurityQuery(`GOLD${suffix}`, {
+        pollingInterval: 5000
+    })
 
     // const EURRate = rateData?.Valute.EUR.Value;
     // const USDRate = rateData?.Valute.USD.Value;
@@ -302,25 +315,30 @@ export const ArbitrageCalculator = () => {
     }
 
     useEffect(() => {
-        if (!rateData || !USDRate || !CNYRate || !EURRate) return;
+        const hasRates = rateData && USDRate != null && CNYRate != null && EURRate != null;
+        const hasGold = GOLDRate != null;
+        if (!hasRates && !hasGold) return;
 
-        const usdCny = USDRate / CNYRate / 1000;
-        const eurUsd = EURRate / USDRate;
-        const eurCny = EURRate / CNYRate / 1000;
+        const usdCny = hasRates ? USDRate / CNYRate / 1000 : null;
+        const eurUsd = hasRates ? EURRate / USDRate : null;
+        const eurCny = hasRates ? EURRate / CNYRate / 1000 : null;
 
         setGroups((prev) =>
             prev.map((group) => {
                 let newInstruments = [...group.instruments];
                 let updated = false;
 
-                if (group.id === `SI/CNY/USDCNH_xp`) {
+                if (group.id === `SI/CNY/USDCNH_xp` && usdCny != null) {
                     newInstruments[1].ratio = usdCny;
                     updated = true;
-                } else if (group.id === `EU/SI/EURUSD_xp`) {
+                } else if (group.id === `EU/SI/EURUSD_xp` && eurUsd != null) {
                     newInstruments[1].ratio = eurUsd;
                     updated = true;
-                } else if (group.id === `EU/CNY/EURCNH_xp`) {
+                } else if (group.id === `EU/CNY/EURCNH_xp` && eurCny != null) {
                     newInstruments[1].ratio = eurCny;
+                    updated = true;
+                } else if (group.id === `GLDRUBF/SI/GOLD` && GOLDRate != null) {
+                    newInstruments[1].ratio = GOLDRate / 1000; // SI = цена GOLD-3.26 / 1000
                     updated = true;
                 }
 
@@ -337,7 +355,7 @@ export const ArbitrageCalculator = () => {
                 return updated ? {...group, instruments: newInstruments} : group;
             })
         );
-    }, [rateData, EURRate, USDRate, CNYRate]);
+    }, [rateData, EURRate, USDRate, CNYRate, GOLDRate]);
 
     useEffect(() => {
         const timeout = setTimeout(() => {
@@ -362,6 +380,8 @@ export const ArbitrageCalculator = () => {
                         symbol="EURUSD"/> {moneyFormat(EURRate / USDRate, 'USD', 0, 2)}</span>
                     <span className="flex gap-1"><AlorLabel
                         symbol="EURCNY"/> {moneyFormat(EURRate / CNYRate / 1000, 'CNY', 0, 2)}</span>
+                    <span className="flex gap-1"><AlorLabel
+                        symbol="GOLD"/> {GOLDRate != null ? moneyFormat(GOLDRate / 1000, 'RUB', 0, 2) : '—'}</span>
                 </div>
                 <a
                     className="flex gap-1 bg-muted p-1 pl-2 pr-2 text-sm rounded-xl items-center"
