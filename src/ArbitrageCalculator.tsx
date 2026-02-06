@@ -159,7 +159,7 @@ const initialTriples = [
         instruments: [
             {name: `GLDRUBF`, value: 31.1, ratio: 1}, // Базовый
             {name: `SI`, value: 0, ratio: 0}, // ratio = цена GOLD-3.26 / 1000 (обновляется из котировок)
-            {name: `GOLD`, value: 1 / 31.1, ratio: 1 / 31.1}, // GOLD = 1/31.1 при GLDRUBF=31.1
+            {name: `GOLD`, value: 1, ratio: 1 / 31.1},
         ],
     },
 ];
@@ -338,8 +338,7 @@ export const ArbitrageCalculator = () => {
                     newInstruments[1].ratio = eurCny;
                     updated = true;
                 } else if (group.id === `GLDRUBF/SI/GOLD` && GOLDRate != null) {
-                    const goldPrice = GOLDRate / 1000;
-                    newInstruments[1].ratio = goldPrice / (31.1 * 31.1); // SI = (цена GOLD / 1000) / 31.1
+                    newInstruments[1].ratio = (GOLDRate / 1000) / 31.1; // SI = цена голды/1000
                     updated = true;
                 }
 
