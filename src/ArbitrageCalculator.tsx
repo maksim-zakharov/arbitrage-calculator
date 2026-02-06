@@ -292,7 +292,7 @@ export const ArbitrageCalculator = () => {
     const {data: CNYRate} = useGetMoexSecurityQuery(`CR${suffix}`, {
         pollingInterval: 5000
     })
-    const {data: GOLDRate} = useGetMoexSecurityQuery(`GOLD${suffix}`, {
+    const {data: GOLDRate} = useGetMoexSecurityQuery(`GD${suffix}`, {
         pollingInterval: 5000
     })
 
