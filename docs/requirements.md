@@ -49,3 +49,9 @@
 
 ---
 
+## Фича: Добавить тройники GOLD-3.26/ED-3.26/XAUEUR_xp и SILV-3.26/ED-3.26/XAGEUR_xp…
+
+Добавить тройники GOLD-3.26/ED-3.26/XAUEUR_xp и SILV-3.26/ED-3.26/XAGEUR_xp
+
+---
+
