@@ -4,8 +4,7 @@ import {Input} from './components/ui/input';
 import {TypographyH2, TypographyH4} from './components/ui/typography';
 import {Card, CardContent, CardHeader, CardTitle} from './components/ui/card';
 import {useGetMoexSecurityQuery, useGetRuRateQuery} from "./api";
-import {getFuturesSuffix, moneyFormat} from "./utils";
-import {Alert, AlertDescription, AlertTitle} from "./components/ui/alert";
+import {formatNumber, getFuturesSuffix, moneyFormat} from "./utils";
 import {Button} from "./components/ui/button";
 
 export const AlorLabel = ({symbol}) => {
@@ -190,6 +189,9 @@ const toStoredValue = (
     return displayed / (1 + moexBiasPercent / 100);
 };
 
+/** Округление до 2 знаков после запятой для хранения */
+const round2 = (n: number) => Math.round(n * 100) / 100;
+
 // Компонент для пары
 const PairCalculator = ({
     group,
@@ -201,10 +203,12 @@ const PairCalculator = ({
     moexBiasPercent?: number;
 }) => {
     const [instruments, setInstruments] = useState(group.instruments);
+    const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
+    const [editingValue, setEditingValue] = useState('');
     const hasForex = groupHasForex(group);
 
     const handleChange = (index: number, val: string | number) => {
-        const value = parseFloat(String(val));
+        const value = round2(parseFloat(String(val)));
         if (isNaN(value) || value < 0) return;
 
         const newInstruments = [...instruments];
@@ -214,7 +218,7 @@ const PairCalculator = ({
         const baseRatio = newInstruments[index].ratio;
         newInstruments.forEach((inst, i) => {
             if (i !== index) {
-                inst.value = Math.round(baseValue * (inst.ratio / baseRatio) * 1000) / 1000;
+                inst.value = round2(baseValue * (inst.ratio / baseRatio));
             }
         });
 
@@ -222,17 +226,27 @@ const PairCalculator = ({
         onUpdate(group.id, newInstruments);
     };
 
-    const handleInputChange = (index: number, displayedInput: string) => {
-        const parsed = parseFloat(displayedInput);
-        if (isNaN(parsed) || parsed < 0) return;
-        const stored = toStoredValue(parsed, instruments[index], group, moexBiasPercent);
-        handleChange(index, stored);
+    const handleFocus = (index: number) => {
+        setFocusedIndex(index);
+        setEditingValue(formatNumber(getDisplayValue(instruments[index], group, moexBiasPercent)));
+    };
+
+    const handleBlur = (index: number) => {
+        if (focusedIndex === index) {
+            const normalized = editingValue.replace(',', '.');
+            const parsed = parseFloat(normalized);
+            if (!isNaN(parsed) && parsed >= 0) {
+                const stored = toStoredValue(parsed, instruments[index], group, moexBiasPercent);
+                handleChange(index, round2(stored));
+            }
+            setFocusedIndex(null);
+        }
     };
 
     const baseDisplayValue = getDisplayValue(instruments[0], group, moexBiasPercent);
     const handleSliderChange = (displayedValues: number[]) => {
         const stored = hasForex ? displayedValues[0] / (1 + moexBiasPercent / 100) : displayedValues[0];
-        handleChange(0, stored);
+        handleChange(0, round2(stored));
     };
 
     return (
@@ -248,12 +262,12 @@ const PairCalculator = ({
                         <label key={index}>
                             {inst.name}:
                             <Input
-                                type="number"
-                                value={getDisplayValue(inst, group, moexBiasPercent)}
-                                onChange={(e) => handleInputChange(index, e.target.value)}
-                                min="0"
-                                step={index === 0 ? '1' : '0.01'}
-                                prefix={inst.name}
+                                type="text"
+                                inputMode="decimal"
+                                value={focusedIndex === index ? editingValue : formatNumber(getDisplayValue(inst, group, moexBiasPercent))}
+                                onChange={(e) => focusedIndex === index && setEditingValue(e.target.value)}
+                                onFocus={() => handleFocus(index)}
+                                onBlur={() => handleBlur(index)}
                             />
                         </label>
                     ))}
@@ -281,10 +295,12 @@ const TripleCalculator = ({
     moexBiasPercent?: number;
 }) => {
     const [instruments, setInstruments] = useState(group.instruments);
+    const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
+    const [editingValue, setEditingValue] = useState('');
     const hasForex = groupHasForex(group);
 
     const handleChange = (index: number, val: string | number) => {
-        const value = parseFloat(String(val));
+        const value = round2(parseFloat(String(val)));
         if (isNaN(value) || value < 0) return;
 
         const newInstruments = [...instruments];
@@ -294,7 +310,7 @@ const TripleCalculator = ({
         const baseRatio = newInstruments[index].ratio;
         newInstruments.forEach((inst, i) => {
             if (i !== index) {
-                inst.value = Math.round(baseValue * (inst.ratio / baseRatio) * 1000) / 1000;
+                inst.value = round2(baseValue * (inst.ratio / baseRatio));
             }
         });
 
@@ -302,17 +318,27 @@ const TripleCalculator = ({
         onUpdate(group.id, newInstruments);
     };
 
-    const handleInputChange = (index: number, displayedInput: string) => {
-        const parsed = parseFloat(displayedInput);
-        if (isNaN(parsed) || parsed < 0) return;
-        const stored = toStoredValue(parsed, instruments[index], group, moexBiasPercent);
-        handleChange(index, stored);
+    const handleFocus = (index: number) => {
+        setFocusedIndex(index);
+        setEditingValue(formatNumber(getDisplayValue(instruments[index], group, moexBiasPercent)));
+    };
+
+    const handleBlur = (index: number) => {
+        if (focusedIndex === index) {
+            const normalized = editingValue.replace(',', '.');
+            const parsed = parseFloat(normalized);
+            if (!isNaN(parsed) && parsed >= 0) {
+                const stored = toStoredValue(parsed, instruments[index], group, moexBiasPercent);
+                handleChange(index, round2(stored));
+            }
+            setFocusedIndex(null);
+        }
     };
 
     const baseDisplayValue = getDisplayValue(instruments[0], group, moexBiasPercent);
     const handleSliderChange = (displayedValues: number[]) => {
         const stored = hasForex ? displayedValues[0] / (1 + moexBiasPercent / 100) : displayedValues[0];
-        handleChange(0, stored);
+        handleChange(0, round2(stored));
     };
 
     return (
@@ -328,11 +354,12 @@ const TripleCalculator = ({
                         <label key={index}>
                             {inst.name}:
                             <Input
-                                type="number"
-                                value={getDisplayValue(inst, group, moexBiasPercent)}
-                                onChange={(e) => handleInputChange(index, e.target.value)}
-                                min="0"
-                                step={index === 0 ? '1' : '0.01'}
+                                type="text"
+                                inputMode="decimal"
+                                value={focusedIndex === index ? editingValue : formatNumber(getDisplayValue(inst, group, moexBiasPercent))}
+                                onChange={(e) => focusedIndex === index && setEditingValue(e.target.value)}
+                                onFocus={() => handleFocus(index)}
+                                onBlur={() => handleBlur(index)}
                             />
                         </label>
                     ))}
@@ -422,7 +449,7 @@ export const ArbitrageCalculator = () => {
                     const baseRatio = newInstruments[0].ratio;
                     newInstruments.forEach((inst, i) => {
                         if (i !== 0) {
-                            inst.value = Math.round(baseValue * (inst.ratio / baseRatio) * 1000) / 1000;
+                            inst.value = round2(baseValue * (inst.ratio / baseRatio));
                         }
                     });
                 }
@@ -462,14 +489,6 @@ export const ArbitrageCalculator = () => {
                     <span className="flex gap-1"><AlorLabel
                         symbol="GOLD"/> {GOLDRate != null ? moneyFormat(GOLDRate, 'USD', 0, 2) : '—'}</span>
                 </div>
-                <a
-                    className="flex gap-1 bg-muted p-1 pl-2 pr-2 text-sm rounded-xl items-center"
-                    href="https://crypto-spreads.ru/arbs-moex-cex?utm_source=calculator&utm_medium=link&utm_campaign=xpbee"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Котировки XPBEE с графиками TradingView
-                </a>
                 <a className="flex gap-1 bg-muted p-1 pl-2 pr-2 text-sm rounded-xl items-center"
                    href="https://t.me/max89701" target="_blank">
                     <div className="img" style={{backgroundImage: `url("/assets/telegram-48px.png")`}}/>
@@ -492,23 +511,19 @@ export const ArbitrageCalculator = () => {
                     max={100}
                     step={1}
                 />
-                <span className="text-sm text-muted-foreground">{moexBiasPercent}%</span>
+                <span className="text-sm text-muted-foreground">{formatNumber(moexBiasPercent)}%</span>
                 <span className="text-xs text-muted-foreground">
                     (только для пар/троек с ногой Форекс _xp)
                 </span>
             </div>
-            <Alert className="w-max">
-                <AlertTitle>Хотите точные графики арбитража из XPBEE бесплатно или за подписку?</AlertTitle>
-                <AlertDescription>
-                    Пройдите быстрый опрос (2 мин)!
-                </AlertDescription>
-                <a href="https://docs.google.com/forms/d/e/1FAIpQLSfRSwFruL7FYCvFKU-eTvg9eUXoHgpMJbCkSRQD0k_kcWL1VQ/viewform?usp=dialog"
-                   target="_blank" className="mt-2">
-                    <Button>
-                        Перейти к опросу
-                    </Button>
-                </a>
-            </Alert>
+            <a
+                className="flex gap-1 bg-muted p-2 text-sm rounded-xl items-center w-max"
+                href="https://crypto-spreads.ru/arbs-moex-cex?utm_source=calculator&utm_medium=link&utm_campaign=xpbee"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                Котировки XPBee — актуальные данные и графики TradingView
+            </a>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                 {groups.map((group) => {
                     if (group.type === 'pair') {

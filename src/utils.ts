@@ -5,6 +5,16 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs))
 }
 
+/** Форматирование числа с округлением до 2 знаков после запятой через Intl.NumberFormat */
+const numberFormat2 = new Intl.NumberFormat('ru-RU', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+});
+
+export function formatNumber(value: number): string {
+    return numberFormat2.format(value);
+}
+
 export const moneyFormat = (
     money: number,
     currency: string = 'RUB',
