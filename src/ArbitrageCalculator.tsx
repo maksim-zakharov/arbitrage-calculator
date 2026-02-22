@@ -164,18 +164,52 @@ const initialTriples = [
     },
 ];
 
-// Компонент для пары
-const PairCalculator = ({group, onUpdate}) => {
-    const [instruments, setInstruments] = useState(group.instruments);
+/** Проверка, есть ли в группе инструмент с Форексом (_xp) */
+const groupHasForex = (group: { instruments: { name: string }[] }) =>
+    group.instruments.some((i) => i.name.endsWith('_xp'));
 
-    const handleChange = (index, val) => {
-        const value = parseFloat(val);
+/** Отображаемое значение ноги с учётом перевеса на MOEX (только для групп с _xp) */
+const getDisplayValue = (
+    inst: { name: string; value: number },
+    group: { instruments: { name: string }[] },
+    moexBiasPercent: number
+): number => {
+    if (!groupHasForex(group)) return inst.value;
+    if (inst.name.endsWith('_xp')) return inst.value;
+    return inst.value * (1 + moexBiasPercent / 100);
+};
+
+/** Сохраняемое значение из введённого пользователем (обратное преобразование перевеса) */
+const toStoredValue = (
+    displayed: number,
+    inst: { name: string },
+    group: { instruments: { name: string }[] },
+    moexBiasPercent: number
+): number => {
+    if (!groupHasForex(group) || inst.name.endsWith('_xp')) return displayed;
+    return displayed / (1 + moexBiasPercent / 100);
+};
+
+// Компонент для пары
+const PairCalculator = ({
+    group,
+    onUpdate,
+    moexBiasPercent = 0,
+}: {
+    group: (typeof initialPairs)[0];
+    onUpdate: (groupId: string, instruments: typeof initialPairs[0]['instruments']) => void;
+    moexBiasPercent?: number;
+}) => {
+    const [instruments, setInstruments] = useState(group.instruments);
+    const hasForex = groupHasForex(group);
+
+    const handleChange = (index: number, val: string | number) => {
+        const value = parseFloat(String(val));
         if (isNaN(value) || value < 0) return;
 
         const newInstruments = [...instruments];
         newInstruments[index].value = value;
 
-        // Пересчёт остальных относительно базового
         const baseValue = value;
         const baseRatio = newInstruments[index].ratio;
         newInstruments.forEach((inst, i) => {
@@ -186,6 +220,19 @@ const PairCalculator = ({group, onUpdate}) => {
 
         setInstruments(newInstruments);
         onUpdate(group.id, newInstruments);
+    };
+
+    const handleInputChange = (index: number, displayedInput: string) => {
+        const parsed = parseFloat(displayedInput);
+        if (isNaN(parsed) || parsed < 0) return;
+        const stored = toStoredValue(parsed, instruments[index], group, moexBiasPercent);
+        handleChange(index, stored);
+    };
+
+    const baseDisplayValue = getDisplayValue(instruments[0], group, moexBiasPercent);
+    const handleSliderChange = (displayedValues: number[]) => {
+        const stored = hasForex ? displayedValues[0] / (1 + moexBiasPercent / 100) : displayedValues[0];
+        handleChange(0, stored);
     };
 
     return (
@@ -202,10 +249,10 @@ const PairCalculator = ({group, onUpdate}) => {
                             {inst.name}:
                             <Input
                                 type="number"
-                                value={inst.value}
-                                onChange={(e) => handleChange(index, e.target.value)}
+                                value={getDisplayValue(inst, group, moexBiasPercent)}
+                                onChange={(e) => handleInputChange(index, e.target.value)}
                                 min="0"
-                                step={index === 0 ? '1' : '0.01'} // Шаг для контрактов/лотов
+                                step={index === 0 ? '1' : '0.01'}
                                 prefix={inst.name}
                             />
                         </label>
@@ -213,8 +260,8 @@ const PairCalculator = ({group, onUpdate}) => {
                 </div>
                 <Slider
                     className="pt-2 pb-2"
-                    value={[instruments[0].value]}
-                    onValueChange={(val) => handleChange(0, val)}
+                    value={[baseDisplayValue]}
+                    onValueChange={(val) => handleSliderChange(val)}
                     max={500}
                     step={1}
                 />
@@ -224,11 +271,20 @@ const PairCalculator = ({group, onUpdate}) => {
 };
 
 // Компонент для тройки (аналогично, но для 3 полей)
-const TripleCalculator = ({group, onUpdate}) => {
+const TripleCalculator = ({
+    group,
+    onUpdate,
+    moexBiasPercent = 0,
+}: {
+    group: (typeof initialTriples)[0];
+    onUpdate: (groupId: string, instruments: typeof initialTriples[0]['instruments']) => void;
+    moexBiasPercent?: number;
+}) => {
     const [instruments, setInstruments] = useState(group.instruments);
+    const hasForex = groupHasForex(group);
 
-    const handleChange = (index, val) => {
-        const value = parseFloat(val);
+    const handleChange = (index: number, val: string | number) => {
+        const value = parseFloat(String(val));
         if (isNaN(value) || value < 0) return;
 
         const newInstruments = [...instruments];
@@ -246,6 +302,19 @@ const TripleCalculator = ({group, onUpdate}) => {
         onUpdate(group.id, newInstruments);
     };
 
+    const handleInputChange = (index: number, displayedInput: string) => {
+        const parsed = parseFloat(displayedInput);
+        if (isNaN(parsed) || parsed < 0) return;
+        const stored = toStoredValue(parsed, instruments[index], group, moexBiasPercent);
+        handleChange(index, stored);
+    };
+
+    const baseDisplayValue = getDisplayValue(instruments[0], group, moexBiasPercent);
+    const handleSliderChange = (displayedValues: number[]) => {
+        const stored = hasForex ? displayedValues[0] / (1 + moexBiasPercent / 100) : displayedValues[0];
+        handleChange(0, stored);
+    };
+
     return (
         <Card className="gap-1 p-2">
             <CardHeader className="pl-2 pt-3">
@@ -260,8 +329,8 @@ const TripleCalculator = ({group, onUpdate}) => {
                             {inst.name}:
                             <Input
                                 type="number"
-                                value={inst.value}
-                                onChange={(e) => handleChange(index, e.target.value)}
+                                value={getDisplayValue(inst, group, moexBiasPercent)}
+                                onChange={(e) => handleInputChange(index, e.target.value)}
                                 min="0"
                                 step={index === 0 ? '1' : '0.01'}
                             />
@@ -270,8 +339,8 @@ const TripleCalculator = ({group, onUpdate}) => {
                 </div>
                 <Slider
                     className="pt-2 pb-2"
-                    value={[instruments[0].value]}
-                    onValueChange={(val) => handleChange(0, val)}
+                    value={[baseDisplayValue]}
+                    onValueChange={(val) => handleSliderChange(val)}
                     max={500}
                     step={1}
                 />
@@ -305,7 +374,13 @@ export const ArbitrageCalculator = () => {
         return saved ? JSON.parse(saved) : [...initialPairs, ...initialTriples];
     });
 
-    const updateGroup = (groupId, updatedInstruments) => {
+    const [moexBiasPercent, setMoexBiasPercent] = useState(() => {
+        const saved = localStorage.getItem('arbitrageMoexBiasPercent');
+        const n = saved ? parseFloat(saved) : 0;
+        return Number.isFinite(n) && n >= 0 && n <= 100 ? n : 0;
+    });
+
+    const updateGroup = (groupId: string, updatedInstruments: { name: string; value: number; ratio: number }[]) => {
         setGroups(groups.map((group) => (group.id === groupId ? {...group, instruments: updatedInstruments} : group)));
     };
 
@@ -365,6 +440,10 @@ export const ArbitrageCalculator = () => {
         return () => clearTimeout(timeout);
     }, [groups]);
 
+    useEffect(() => {
+        localStorage.setItem('arbitrageMoexBiasPercent', String(moexBiasPercent));
+    }, [moexBiasPercent]);
+
     return (
         <div className="flex gap-2 flex-col pl-4 pr-4 h-screen">
             <div className="flex flex-wrap justify-between pt-2 pb-2">
@@ -403,6 +482,21 @@ export const ArbitrageCalculator = () => {
                      onClick={update}>Обновить
                 </Button>
             </div>
+            <div className="flex flex-wrap items-center gap-4 py-2">
+                <span className="text-sm font-medium">Перевес на MOEX, %</span>
+                <Slider
+                    className="w-40"
+                    value={[moexBiasPercent]}
+                    onValueChange={(v) => setMoexBiasPercent(v[0])}
+                    min={0}
+                    max={100}
+                    step={1}
+                />
+                <span className="text-sm text-muted-foreground">{moexBiasPercent}%</span>
+                <span className="text-xs text-muted-foreground">
+                    (только для пар/троек с ногой Форекс _xp)
+                </span>
+            </div>
             <Alert className="w-max">
                 <AlertTitle>Хотите точные графики арбитража из XPBEE бесплатно или за подписку?</AlertTitle>
                 <AlertDescription>
@@ -418,9 +512,23 @@ export const ArbitrageCalculator = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                 {groups.map((group) => {
                     if (group.type === 'pair') {
-                        return <PairCalculator key={group.id} group={group} onUpdate={updateGroup}/>;
+                        return (
+                            <PairCalculator
+                                key={group.id}
+                                group={group}
+                                onUpdate={updateGroup}
+                                moexBiasPercent={moexBiasPercent}
+                            />
+                        );
                     } else {
-                        return <TripleCalculator key={group.id} group={group} onUpdate={updateGroup}/>;
+                        return (
+                            <TripleCalculator
+                                key={group.id}
+                                group={group}
+                                onUpdate={updateGroup}
+                                moexBiasPercent={moexBiasPercent}
+                            />
+                        );
                     }
                 })}
             </div>
