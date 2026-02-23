@@ -466,10 +466,10 @@ export const ArbitrageCalculator = () => {
                     newInstruments[1].ratio = (GOLDRate / 1000) / 31.1; // SI = цена голды/1000
                     updated = true;
                 } else if (group.id === `GOLD-3.26/ED-3.26/XAUEUR_xp` && GOLDRate != null && EURRate != null) {
-                    newInstruments[1].ratio = GOLDRate / EURRate;
+                    newInstruments[1].ratio = GOLDRate;
                     updated = true;
                 } else if (group.id === `SILV-3.26/ED-3.26/XAGEUR_xp` && SilverRate != null && EURRate != null) {
-                    newInstruments[1].ratio = SilverRate / EURRate;
+                    newInstruments[1].ratio = SilverRate;
                     updated = true;
                 }
 
