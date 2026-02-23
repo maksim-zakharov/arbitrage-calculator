@@ -467,13 +467,14 @@ export const ArbitrageCalculator = () => {
                 } else if (group.id === `GLDRUBF/SI/GOLD` && GOLDRate != null) {
                     newInstruments[1].ratio = (GOLDRate / 1000) / 31.1; // SI = цена голды/1000
                     updated = true;
-                } else if (group.id === `GOLD-3.26/ED-3.26/XAUEUR_xp` && GOLDRate != null && EURRate != null) {
-                    newInstruments[1].ratio = goldEur;
-                    updated = true;
-                } else if (group.id === `SILV-3.26/ED-3.26/XAGEUR_xp` && SilverRate != null && EURRate != null) {
-                    newInstruments[1].ratio = silvEur;
-                    updated = true;
-                }
+                } 
+                // else if (group.id === `GOLD-3.26/ED-3.26/XAUEUR_xp` && GOLDRate != null && EURRate != null) {
+                //     newInstruments[1].ratio = goldEur;
+                //     updated = true;
+                // } else if (group.id === `SILV-3.26/ED-3.26/XAGEUR_xp` && SilverRate != null && EURRate != null) {
+                //     newInstruments[1].ratio = silvEur;
+                //     updated = true;
+                // }
 
                 if (updated) {
                     const baseValue = newInstruments[0].value;
