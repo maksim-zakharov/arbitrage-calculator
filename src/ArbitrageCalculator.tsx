@@ -447,6 +447,8 @@ export const ArbitrageCalculator = () => {
         const usdCny = hasRates ? USDRate / CNYRate / 1000 : null;
         const eurUsd = hasRates ? EURRate / USDRate : null;
         const eurCny = hasRates ? EURRate / CNYRate / 1000 : null;
+        const goldEur = hasRates ? GOLDRate / EURRate / 1000 : null;
+        const silvEur = hasRates ? SilverRate / CNYRate / 1000 : null;
 
         setGroups((prev) =>
             prev.map((group) => {
@@ -466,10 +468,10 @@ export const ArbitrageCalculator = () => {
                     newInstruments[1].ratio = (GOLDRate / 1000) / 31.1; // SI = цена голды/1000
                     updated = true;
                 } else if (group.id === `GOLD-3.26/ED-3.26/XAUEUR_xp` && GOLDRate != null && EURRate != null) {
-                    newInstruments[1].ratio = GOLDRate;
+                    newInstruments[1].ratio = goldEur;
                     updated = true;
                 } else if (group.id === `SILV-3.26/ED-3.26/XAGEUR_xp` && SilverRate != null && EURRate != null) {
-                    newInstruments[1].ratio = SilverRate;
+                    newInstruments[1].ratio = silvEur;
                     updated = true;
                 }
 
