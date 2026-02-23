@@ -161,6 +161,25 @@ const initialTriples = [
             {name: `GOLD`, value: 1, ratio: 1 / 31.1},
         ],
     },
+    // Тройники с фьючерсами GOLD-3.26, ED-3.26 и экспортными инструментами _xp
+    {
+        id: `GOLD-3.26/ED-3.26/XAUEUR_xp`,
+        type: 'triple',
+        instruments: [
+            {name: `GOLD-3.26`, value: 1, ratio: 1},
+            {name: `ED-3.26`, value: 1, ratio: 1},
+            {name: `XAUEUR_xp`, value: 0.01, ratio: 0.01},
+        ],
+    },
+    {
+        id: `SILV-3.26/ED-3.26/XAGEUR_xp`,
+        type: 'triple',
+        instruments: [
+            {name: `SILV-3.26`, value: 1, ratio: 1},
+            {name: `ED-3.26`, value: 1, ratio: 1},
+            {name: `XAGEUR_xp`, value: 0.01, ratio: 0.01},
+        ],
+    },
 ];
 
 /** Проверка, есть ли в группе инструмент с Форексом (_xp) */
@@ -391,6 +410,9 @@ export const ArbitrageCalculator = () => {
     const {data: GOLDRate} = useGetMoexSecurityQuery(`GD${suffix}`, {
         pollingInterval: 5000
     })
+    const {data: SilverRate} = useGetMoexSecurityQuery(`SV${suffix}`, {
+        pollingInterval: 5000
+    })
 
     // const EURRate = rateData?.Valute.EUR.Value;
     // const USDRate = rateData?.Valute.USD.Value;
@@ -419,7 +441,8 @@ export const ArbitrageCalculator = () => {
     useEffect(() => {
         const hasRates = rateData && USDRate != null && CNYRate != null && EURRate != null;
         const hasGold = GOLDRate != null;
-        if (!hasRates && !hasGold) return;
+        const hasSilver = SilverRate != null;
+        if (!hasRates && !hasGold && !hasSilver) return;
 
         const usdCny = hasRates ? USDRate / CNYRate / 1000 : null;
         const eurUsd = hasRates ? EURRate / USDRate : null;
@@ -442,6 +465,12 @@ export const ArbitrageCalculator = () => {
                 } else if (group.id === `GLDRUBF/SI/GOLD` && GOLDRate != null) {
                     newInstruments[1].ratio = (GOLDRate / 1000) / 31.1; // SI = цена голды/1000
                     updated = true;
+                } else if (group.id === `GOLD-3.26/ED-3.26/XAUEUR_xp` && GOLDRate != null && EURRate != null) {
+                    newInstruments[1].ratio = GOLDRate / EURRate;
+                    updated = true;
+                } else if (group.id === `SILV-3.26/ED-3.26/XAGEUR_xp` && SilverRate != null && EURRate != null) {
+                    newInstruments[1].ratio = SilverRate / EURRate;
+                    updated = true;
                 }
 
                 if (updated) {
@@ -457,7 +486,7 @@ export const ArbitrageCalculator = () => {
                 return updated ? {...group, instruments: newInstruments} : group;
             })
         );
-    }, [rateData, EURRate, USDRate, CNYRate, GOLDRate]);
+    }, [rateData, EURRate, USDRate, CNYRate, GOLDRate, SilverRate]);
 
     useEffect(() => {
         const timeout = setTimeout(() => {
@@ -488,6 +517,8 @@ export const ArbitrageCalculator = () => {
                         symbol="EURCNY"/> {moneyFormat(EURRate / CNYRate / 1000, 'CNY', 0, 2)}</span>
                     <span className="flex gap-1"><AlorLabel
                         symbol="GOLD"/> {GOLDRate != null ? moneyFormat(GOLDRate, 'USD', 0, 2) : '—'}</span>
+                    <span className="flex gap-1"><AlorLabel
+                        symbol="SILV"/> {SilverRate != null ? moneyFormat(SilverRate, 'USD', 0, 2) : '—'}</span>
                 </div>
                 <a className="flex gap-1 bg-muted p-1 pl-2 pr-2 text-sm rounded-xl items-center"
                    href="https://t.me/max89701" target="_blank">

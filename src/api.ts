@@ -19,9 +19,8 @@ export const api = createApi({
         const columns = data.marketdata.columns;
         const lastIndex = columns.indexOf('LAST');
         const lastPrice = marketData[lastIndex];
-        console.log(`Последняя цена для ${'sec'}: ${lastPrice}`);
-        return lastPrice
-      }
+        return lastPrice;
+      },
     })
   }),
 });
