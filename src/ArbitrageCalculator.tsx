@@ -448,7 +448,7 @@ export const ArbitrageCalculator = () => {
         const eurUsd = hasRates ? EURRate / USDRate : null;
         const eurCny = hasRates ? EURRate / CNYRate / 1000 : null;
         const goldEur = hasRates ? GOLDRate / EURRate / 1000 : null;
-        const silvEur = hasRates ? SilverRate / CNYRate / 1000 : null;
+        const silvEur = hasRates ? SilverRate / EURRate / 1000 : null;
 
         setGroups((prev) =>
             prev.map((group) => {
