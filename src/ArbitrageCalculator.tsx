@@ -162,24 +162,24 @@ const initialTriples = [
         ],
     },
     // Тройники с фьючерсами GOLD-3.26, ED-3.26 и экспортными инструментами _xp
-    {
-        id: `GOLD-3.26/ED-3.26/XAUEUR_xp`,
-        type: 'triple',
-        instruments: [
-            {name: `GOLD-3.26`, value: 1, ratio: 1},
-            {name: `ED-3.26`, value: 1, ratio: 1},
-            {name: `XAUEUR_xp`, value: 0.01, ratio: 0.01},
-        ],
-    },
-    {
-        id: `SILV-3.26/ED-3.26/XAGEUR_xp`,
-        type: 'triple',
-        instruments: [
-            {name: `SILV-3.26`, value: 1, ratio: 1},
-            {name: `ED-3.26`, value: 1, ratio: 1},
-            {name: `XAGEUR_xp`, value: 0.01, ratio: 0.01},
-        ],
-    },
+    // {
+    //     id: `GOLD-3.26/ED-3.26/XAUEUR_xp`,
+    //     type: 'triple',
+    //     instruments: [
+    //         {name: `GOLD-3.26`, value: 1, ratio: 1},
+    //         {name: `ED-3.26`, value: 1, ratio: 1},
+    //         {name: `XAUEUR_xp`, value: 0.01, ratio: 0.01},
+    //     ],
+    // },
+    // {
+    //     id: `SILV-3.26/ED-3.26/XAGEUR_xp`,
+    //     type: 'triple',
+    //     instruments: [
+    //         {name: `SILV-3.26`, value: 1, ratio: 1},
+    //         {name: `ED-3.26`, value: 1, ratio: 1},
+    //         {name: `XAGEUR_xp`, value: 0.01, ratio: 0.01},
+    //     ],
+    // },
 ];
 
 /** Проверка, есть ли в группе инструмент с Форексом (_xp) */
