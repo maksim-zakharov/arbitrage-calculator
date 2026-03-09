@@ -24,7 +24,8 @@ export const AlorLabel = ({symbol}) => {
         EU: 'EUR1',
         RUB: 'ruble',
         ETH: 'Ethereum',
-        BTC: 'BITOK'
+        BTC: 'BITOK',
+        BR: 'OilFut',
     };
 
     const bybitMap = {
@@ -120,6 +121,14 @@ const initialPairs = [
         instruments: [
             {name: `ETH`, value: 12, ratio: 12},
             {name: `ETHUSD_xp`, value: 0.01, ratio: 0.01},
+        ],
+    },
+    {
+        id: `BR/BRNUSD_xp`,
+        type: 'pair',
+        instruments: [
+            {name: `BR`, value: 10, ratio: 1},
+            {name: `BRNUSD_xp`, value: 0.1, ratio: 0.01},
         ],
     },
 ];
