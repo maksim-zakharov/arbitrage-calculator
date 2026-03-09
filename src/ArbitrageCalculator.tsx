@@ -26,6 +26,8 @@ export const AlorLabel = ({symbol}) => {
         ETH: 'Ethereum',
         BTC: 'BITOK',
         BR: 'OilFut',
+        NG: 'NG',
+        COPPER: 'Co',
     };
 
     const bybitMap = {
@@ -131,6 +133,22 @@ const initialPairs = [
             {name: `BRNUSD_xp`, value: 0.1, ratio: 0.01},
         ],
     },
+    {
+        id: `NG/NGUSD_xp`,
+        type: 'pair',
+        instruments: [
+            {name: `NG`, value: 100, ratio: 1},
+            {name: `NGUSD_xp`, value: 1, ratio: 0.01},
+        ],
+    },
+    // {
+    //     id: `COPPER/CUCUSD_xp`,
+    //     type: 'pair',
+    //     instruments: [
+    //         {name: `COPPER`, value: 220, ratio: 1}, // MOEX: в кг
+    //         {name: `CUCUSD_xp`, value: 1, ratio: 0.01 / 2.20462}, // Форекс: в фунтах (lb), 1 kg = 2.20462 lb
+    //     ],
+    // },
 ];
 
 const initialTriples = [
