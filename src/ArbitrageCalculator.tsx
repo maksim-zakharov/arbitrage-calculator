@@ -28,6 +28,7 @@ export const AlorLabel = ({symbol}) => {
         BR: 'OilFut',
         NG: 'NG',
         COPPER: 'Co',
+        NASD: 'NASDAQ100',
     };
 
     const bybitMap = {
@@ -149,6 +150,14 @@ const initialPairs = [
     //         {name: `CUCUSD_xp`, value: 1, ratio: 0.01 / 2.20462}, // Форекс: в фунтах (lb), 1 kg = 2.20462 lb
     //     ],
     // },
+    {
+        id: `NASD/NDXUSD_xp`,
+        type: 'pair',
+        instruments: [
+            {name: `NASD`, value: 1000, ratio: 1},
+            {name: `NDXUSD_xp`, value: 1, ratio: 0.001},
+        ],
+    },
 ];
 
 const initialTriples = [
