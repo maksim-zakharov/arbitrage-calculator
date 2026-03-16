@@ -122,8 +122,8 @@ const initialPairs = [
         id: `ETH/ETHUSD_xp`,
         type: 'pair',
         instruments: [
-            {name: `ETH`, value: 1000, ratio: 1},
-            {name: `ETHUSD_xp`, value: 1, ratio: 0.001},
+            {name: `ETH`, value: 100, ratio: 1},
+            {name: `ETHUSD_xp`, value: 1, ratio: 0.01},
         ],
     },
     {
