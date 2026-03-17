@@ -65,7 +65,7 @@ export function ArbitrageCalculator() {
     <div className="flex gap-2 flex-col pl-4 pr-4 h-screen">
       <div className="flex flex-wrap justify-between pt-2 pb-2">
         <div className="grid grid-cols-2 gap-6 md:flex md:flex-nowrap">
-          <span className="flex gap-1">
+          <span className="flex gap-1 align-middle">
             <AlorLabel symbol="EUR" />{' '}
             {moneyFormat((EURRate ?? 0) / 1000, 'RUB', 0, 2)}
           </span>
