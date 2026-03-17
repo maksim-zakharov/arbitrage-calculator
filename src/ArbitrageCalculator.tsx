@@ -161,7 +161,7 @@ export function ArbitrageCalculator() {
           />
         </TabsContent>
         <TabsContent value="fxpro" className="flex-1 min-h-0 overflow-auto mt-2">
-          <FxproCalculator />
+          <FxproCalculator moexBiasPercent={moexBiasPercent} />
         </TabsContent>
         <TabsContent value="hyperliquid" className="flex-1 min-h-0 overflow-auto mt-2">
           <HyperliquidCalculator moexBiasPercent={moexBiasPercent} />

@@ -231,11 +231,6 @@ export function HyperliquidCalculator({
 
   return (
     <div className="flex gap-2 flex-col flex-1">
-      <div className="pb-2">
-        <TypographyH4>
-          Пары MOEX / Hyperliquid (USDC), соотношение 1 к N
-        </TypographyH4>
-      </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
         {groups.map((group) => (
           <PairCard
