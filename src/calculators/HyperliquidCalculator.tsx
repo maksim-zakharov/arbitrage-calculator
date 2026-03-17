@@ -69,6 +69,14 @@ const initialPairs: HyperliquidPair[] = [
       { name: 'PLATINUM-USDC', value: 1, ratio: 1 },
     ],
   },
+  {
+    id: 'NASD/XYZ100',
+    type: 'pair',
+    instruments: [
+      { name: 'NASD', value: 100, ratio: 1 },
+      { name: 'XYZ100', value: 1, ratio: 0.01 },
+    ],
+  },
 ];
 
 const round2 = (n: number): number => Math.round(n * 100) / 100;
