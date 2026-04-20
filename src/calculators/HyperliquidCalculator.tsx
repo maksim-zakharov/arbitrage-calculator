@@ -38,6 +38,14 @@ const initialPairs: HyperliquidPair[] = [
     ],
   },
   {
+    id: 'ED/EURUSD-USDC',
+    type: 'pair',
+    instruments: [
+      { name: 'ED', value: 1, ratio: 1 },
+      { name: 'EURUSD-USDC', value: 1000, ratio: 1000 },
+    ],
+  },
+  {
     id: 'GOLD/GOLD-USDC',
     type: 'pair',
     instruments: [
