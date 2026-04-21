@@ -9,9 +9,10 @@ import { useGetMoexSecurityQuery } from './api';
 import { XpbeeCalculator } from './calculators/XpbeeCalculator';
 import { FxproCalculator } from './calculators/FxproCalculator';
 import { HyperliquidCalculator } from './calculators/HyperliquidCalculator';
+import { BybitCalculator } from './calculators/BybitCalculator';
 import { AlorLabel } from './calculators/XpbeeCalculator';
 
-const TAB_VALUES = ['xpbee', 'fxpro', 'hyperliquid'] as const;
+const TAB_VALUES = ['xpbee', 'bybit', 'fxpro', 'hyperliquid'] as const;
 type TabValue = (typeof TAB_VALUES)[number];
 
 function isValidTab(value: string | null): value is TabValue {
@@ -151,6 +152,7 @@ export function ArbitrageCalculator() {
       >
         <TabsList>
           <TabsTrigger value="xpbee">XPBEE</TabsTrigger>
+          <TabsTrigger value="bybit">BYBIT</TabsTrigger>
           <TabsTrigger value="fxpro">FXPRO</TabsTrigger>
           <TabsTrigger value="hyperliquid">Hyperliquid</TabsTrigger>
         </TabsList>
@@ -160,8 +162,14 @@ export function ArbitrageCalculator() {
             moexBiasPercent={moexBiasPercent}
           />
         </TabsContent>
+        <TabsContent value="bybit" className="flex-1 min-h-0 overflow-auto mt-2">
+          <BybitCalculator />
+        </TabsContent>
         <TabsContent value="fxpro" className="flex-1 min-h-0 overflow-auto mt-2">
-          <FxproCalculator moexBiasPercent={moexBiasPercent} />
+          <FxproCalculator
+            rates={{ EURRate, USDRate, CNYRate, GOLDRate, SilverRate }}
+            moexBiasPercent={moexBiasPercent}
+          />
         </TabsContent>
         <TabsContent value="hyperliquid" className="flex-1 min-h-0 overflow-auto mt-2">
           <HyperliquidCalculator moexBiasPercent={moexBiasPercent} />

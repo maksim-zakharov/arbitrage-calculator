@@ -3,7 +3,7 @@ import { Slider } from '../components/ui/slider';
 import { Input } from '../components/ui/input';
 import { TypographyH4 } from '../components/ui/typography';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { formatNumber } from '../utils';
+import { formatNumber, sortGroupsByMoexLeg } from '../utils';
 
 /** Маппинг тикеров MOEX на ключи иконок (Tinkoff CDN). */
 const moexIconMap: Record<string, string> = {
@@ -39,16 +39,20 @@ const tinkoffIconUrl = (key: string) =>
 
 export const AlorLabel = ({ symbol }: { symbol: string }) => {
   if (symbol.includes('/')) {
-    const [left, right] = symbol.split('/');
+    const parts = symbol.split('/');
+    const [left] = parts;
     const keyLeft = moexIconMap[left];
     return (
       <div className="flex gap-1 items-center flex-wrap">
         {keyLeft && (
           <div className="img" style={{ backgroundImage: tinkoffIconUrl(keyLeft) }} />
         )}
-        <span>{left}</span>
-        <span className="text-muted-foreground">/</span>
-        <span>{right}</span>
+        {parts.map((part, index) => (
+          <React.Fragment key={`${symbol}-${part}-${index}`}>
+            {index > 0 && <span className="text-muted-foreground">/</span>}
+            <span>{part}</span>
+          </React.Fragment>
+        ))}
       </div>
     );
   }
@@ -104,14 +108,6 @@ const initialPairs: CalculatorGroup[] = [
     instruments: [
       { name: 'GOLD', value: 1, ratio: 1 },
       { name: 'XAUUSD_xp', value: 0.01, ratio: 0.01 },
-    ],
-  },
-  {
-    id: 'GOLD/BYBIT:PAXGUSDT',
-    type: 'pair',
-    instruments: [
-      { name: 'GOLD', value: 1, ratio: 1 },
-      { name: 'BYBIT:PAXGUSDT', value: 1, ratio: 1 },
     ],
   },
   {
@@ -559,7 +555,7 @@ export function XpbeeCalculator({ rates, moexBiasPercent }: XpbeeCalculatorProps
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-      {groups.map((group) =>
+      {sortGroupsByMoexLeg(groups).map((group) =>
         group.type === 'pair' ? (
           <PairCalculator
             key={group.id}

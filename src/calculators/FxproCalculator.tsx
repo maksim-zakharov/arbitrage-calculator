@@ -3,8 +3,8 @@ import { Slider } from '../components/ui/slider';
 import { Input } from '../components/ui/input';
 import { TypographyH4 } from '../components/ui/typography';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { formatNumber } from '../utils';
-import { AlorLabel } from './XpbeeCalculator';
+import { formatNumber, sortGroupsByMoexLeg } from '../utils';
+import { AlorLabel, XpbeeRates } from './XpbeeCalculator';
 
 interface Instrument {
   name: string;
@@ -12,15 +12,15 @@ interface Instrument {
   ratio: number;
 }
 
-interface FxproPair {
+interface FxproGroup {
   id: string;
-  type: 'pair';
+  type: 'pair' | 'triple';
   instruments: Instrument[];
 }
 
 const FXPRO_STORAGE_KEY = 'fxproGroups';
 
-const initialPairs: FxproPair[] = [
+const initialPairs: FxproGroup[] = [
   {
     id: 'BR/BRENT',
     type: 'pair',
@@ -69,6 +69,15 @@ const initialPairs: FxproPair[] = [
       { name: 'XPDUSD', value: 1, ratio: 0.01 },
     ],
   },
+  {
+    id: 'EU/CNY/EURCNH',
+    type: 'triple',
+    instruments: [
+      { name: 'EU', value: 1, ratio: 1 },
+      { name: 'CNY', value: 8, ratio: 8 },
+      { name: 'EURCNH', value: 0.01, ratio: 0.01 },
+    ],
+  },
 ];
 
 const round2 = (n: number): number => Math.round(n * 100) / 100;
@@ -88,7 +97,7 @@ const toStoredValue = (
   index === 0 ? displayed / (1 + moexBiasPercent / 100) : displayed;
 
 interface PairCardProps {
-  group: FxproPair;
+  group: FxproGroup;
   onUpdate: (groupId: string, instruments: Instrument[]) => void;
   moexBiasPercent: number;
 }
@@ -156,7 +165,11 @@ function PairCard({ group, onUpdate, moexBiasPercent }: PairCardProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="p-2">
-        <div className="grid grid-cols-2 gap-4 mb-2">
+        <div
+          className={`grid ${
+            instruments.length === 3 ? 'grid-cols-3' : 'grid-cols-2'
+          } gap-4 mb-2`}
+        >
           {instruments.map((inst, index) => (
             <label key={index}>
               {inst.name}:
@@ -192,6 +205,7 @@ function PairCard({ group, onUpdate, moexBiasPercent }: PairCardProps) {
 }
 
 interface FxproCalculatorProps {
+  rates: XpbeeRates;
   moexBiasPercent: number;
 }
 
@@ -199,9 +213,12 @@ interface FxproCalculatorProps {
  * Калькулятор лотности для арбитража MOEX / FXPRO.
  */
 export function FxproCalculator({
+  rates,
   moexBiasPercent,
 }: FxproCalculatorProps) {
-  const [groups, setGroups] = useState<FxproPair[]>(() => {
+  const { EURRate, CNYRate } = rates;
+
+  const [groups, setGroups] = useState<FxproGroup[]>(() => {
     const saved = localStorage.getItem(FXPRO_STORAGE_KEY);
     return saved ? JSON.parse(saved) : [...initialPairs];
   });
@@ -220,6 +237,30 @@ export function FxproCalculator({
   };
 
   useEffect(() => {
+    if (EURRate == null || CNYRate == null) return;
+
+    const eurCny = EURRate / CNYRate / 1000;
+    setGroups((prev) =>
+      prev.map((group) => {
+        if (group.id !== 'EU/CNY/EURCNH') return group;
+
+        const newInstruments = group.instruments.map((inst) => ({ ...inst }));
+        newInstruments[1].ratio = eurCny;
+
+        const baseValue = newInstruments[0].value;
+        const baseRatio = newInstruments[0].ratio;
+        newInstruments.forEach((inst, i) => {
+          if (i !== 0) {
+            inst.value = round2(baseValue * (inst.ratio / baseRatio));
+          }
+        });
+
+        return { ...group, instruments: newInstruments };
+      })
+    );
+  }, [EURRate, CNYRate]);
+
+  useEffect(() => {
     const timeout = setTimeout(() => {
       localStorage.setItem(FXPRO_STORAGE_KEY, JSON.stringify(groups));
     }, 500);
@@ -229,7 +270,7 @@ export function FxproCalculator({
   return (
     <div className="flex gap-2 flex-col flex-1">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-        {groups.map((group) => (
+        {sortGroupsByMoexLeg(groups).map((group) => (
           <PairCard
             key={group.id}
             group={group}

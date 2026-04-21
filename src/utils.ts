@@ -71,3 +71,28 @@ export function getFuturesSuffix() {
     const yearDigit = expYear % 10;
     return letter + yearDigit;
 }
+
+interface SortableInstrument {
+    name: string;
+}
+
+interface SortableGroup {
+    id: string;
+    instruments: SortableInstrument[];
+}
+
+/**
+ * Унифицированная сортировка карточек по первой (MOEX) ноге.
+ * Используется во всех вкладках калькуляторов для одинакового порядка.
+ */
+export function sortGroupsByMoexLeg<T extends SortableGroup>(groups: T[]): T[] {
+    return [...groups].sort((leftGroup, rightGroup) => {
+        const leftMoexLeg = leftGroup.instruments[0]?.name ?? '';
+        const rightMoexLeg = rightGroup.instruments[0]?.name ?? '';
+        const byMoexLeg = leftMoexLeg.localeCompare(rightMoexLeg, 'ru-RU');
+        if (byMoexLeg !== 0) {
+            return byMoexLeg;
+        }
+        return leftGroup.id.localeCompare(rightGroup.id, 'ru-RU');
+    });
+}

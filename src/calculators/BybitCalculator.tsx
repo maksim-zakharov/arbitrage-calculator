@@ -12,106 +12,33 @@ interface Instrument {
   ratio: number;
 }
 
-interface HyperliquidPair {
+interface BybitPair {
   id: string;
   type: 'pair';
   instruments: Instrument[];
 }
 
-const HYPERLIQUID_STORAGE_KEY = 'hyperliquidGroups';
+const BYBIT_STORAGE_KEY = 'bybitGroups';
 
-const initialPairs: HyperliquidPair[] = [
+const initialPairs: BybitPair[] = [
   {
-    id: 'BR/BRENTOIL-USDC',
-    type: 'pair',
-    instruments: [
-      { name: 'BR', value: 1, ratio: 1 },
-      { name: 'BRENTOIL-USDC', value: 10, ratio: 10 },
-    ],
-  },
-  {
-    id: 'NG/NATGAS-USDC',
-    type: 'pair',
-    instruments: [
-      { name: 'NG', value: 1, ratio: 1 },
-      { name: 'NATGAS-USDC', value: 100, ratio: 100 },
-    ],
-  },
-  {
-    id: 'ED/EURUSD-USDC',
-    type: 'pair',
-    instruments: [
-      { name: 'ED', value: 1, ratio: 1 },
-      { name: 'EURUSD-USDC', value: 1000, ratio: 1000 },
-    ],
-  },
-  {
-    id: 'GOLD/GOLD-USDC',
+    id: 'GOLD/BYBIT:PAXGUSDT',
     type: 'pair',
     instruments: [
       { name: 'GOLD', value: 1, ratio: 1 },
-      { name: 'GOLD-USDC', value: 1, ratio: 10 },
-    ],
-  },
-  {
-    id: 'SILV/SILVER-USDC',
-    type: 'pair',
-    instruments: [
-      { name: 'SILV', value: 1, ratio: 1 },
-      { name: 'SILVER-USDC', value: 10, ratio: 10 },
-    ],
-  },
-  {
-    id: 'PLD/PALLADIUM-USDC',
-    type: 'pair',
-    instruments: [
-      { name: 'PLD', value: 1, ratio: 1 },
-      { name: 'PALLADIUM-USDC', value: 1, ratio: 1 },
-    ],
-  },
-  {
-    id: 'PLT/PLATINUM-USDC',
-    type: 'pair',
-    instruments: [
-      { name: 'PLT', value: 1, ratio: 1 },
-      { name: 'PLATINUM-USDC', value: 1, ratio: 1 },
-    ],
-  },
-  {
-    id: 'NASD/XYZ100',
-    type: 'pair',
-    instruments: [
-      { name: 'NASD', value: 100, ratio: 1 },
-      { name: 'XYZ100', value: 1, ratio: 0.01 },
+      { name: 'BYBIT:PAXGUSDT', value: 1, ratio: 1 },
     ],
   },
 ];
 
 const round2 = (n: number): number => Math.round(n * 100) / 100;
 
-/** Отображаемое значение: для MOEX-ноги (index 0) учитываем перевес. */
-const getDisplayValue = (
-  inst: Instrument,
-  index: number,
-  moexBiasPercent: number
-): number =>
-  index === 0 ? inst.value * (1 + moexBiasPercent / 100) : inst.value;
-
-/** В сохраняемое значение: из введённого пересчитываем MOEX-ногу обратно. */
-const toStoredValue = (
-  displayed: number,
-  index: number,
-  moexBiasPercent: number
-): number =>
-  index === 0 ? displayed / (1 + moexBiasPercent / 100) : displayed;
-
 interface PairCardProps {
-  group: HyperliquidPair;
+  group: BybitPair;
   onUpdate: (groupId: string, instruments: Instrument[]) => void;
-  moexBiasPercent: number;
 }
 
-function PairCard({ group, onUpdate, moexBiasPercent }: PairCardProps) {
+function PairCard({ group, onUpdate }: PairCardProps) {
   const [instruments, setInstruments] = useState(group.instruments);
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
   const [editingValue, setEditingValue] = useState('');
@@ -137,9 +64,7 @@ function PairCard({ group, onUpdate, moexBiasPercent }: PairCardProps) {
 
   const handleFocus = (index: number) => {
     setFocusedIndex(index);
-    setEditingValue(
-      formatNumber(getDisplayValue(instruments[index], index, moexBiasPercent))
-    );
+    setEditingValue(formatNumber(instruments[index].value));
   };
 
   const handleBlur = (index: number) => {
@@ -147,21 +72,14 @@ function PairCard({ group, onUpdate, moexBiasPercent }: PairCardProps) {
       const normalized = editingValue.replace(',', '.');
       const parsed = parseFloat(normalized);
       if (!Number.isNaN(parsed) && parsed >= 0) {
-        const stored = toStoredValue(parsed, index, moexBiasPercent);
-        handleChange(index, round2(stored));
+        handleChange(index, round2(parsed));
       }
       setFocusedIndex(null);
     }
   };
 
-  const baseDisplayValue = getDisplayValue(
-    instruments[0],
-    0,
-    moexBiasPercent
-  );
   const handleSliderChange = (values: number[]) => {
-    const stored = values[0] / (1 + moexBiasPercent / 100);
-    handleChange(0, round2(stored));
+    handleChange(0, round2(values[0]));
   };
 
   return (
@@ -181,13 +99,7 @@ function PairCard({ group, onUpdate, moexBiasPercent }: PairCardProps) {
               <Input
                 type="text"
                 inputMode="decimal"
-                value={
-                  focusedIndex === index
-                    ? editingValue
-                    : formatNumber(
-                        getDisplayValue(inst, index, moexBiasPercent)
-                      )
-                }
+                value={focusedIndex === index ? editingValue : formatNumber(inst.value)}
                 onChange={(e) =>
                   focusedIndex === index && setEditingValue(e.target.value)
                 }
@@ -199,7 +111,7 @@ function PairCard({ group, onUpdate, moexBiasPercent }: PairCardProps) {
         </div>
         <Slider
           className="pt-2 pb-2"
-          value={[baseDisplayValue]}
+          value={[instruments[0].value]}
           onValueChange={handleSliderChange}
           max={500}
           step={1}
@@ -209,19 +121,12 @@ function PairCard({ group, onUpdate, moexBiasPercent }: PairCardProps) {
   );
 }
 
-interface HyperliquidCalculatorProps {
-  /** Перевес на MOEX, % (отображаемое значение MOEX-ноги = хранимое × (1 + moexBiasPercent/100)). */
-  moexBiasPercent: number;
-}
-
 /**
- * Калькулятор лотности для арбитража MOEX / Hyperliquid (пары USDC).
+ * Отдельный калькулятор для инструментов BYBIT.
  */
-export function HyperliquidCalculator({
-  moexBiasPercent,
-}: HyperliquidCalculatorProps) {
-  const [groups, setGroups] = useState<HyperliquidPair[]>(() => {
-    const saved = localStorage.getItem(HYPERLIQUID_STORAGE_KEY);
+export function BybitCalculator() {
+  const [groups, setGroups] = useState<BybitPair[]>(() => {
+    const saved = localStorage.getItem(BYBIT_STORAGE_KEY);
     return saved ? JSON.parse(saved) : [...initialPairs];
   });
 
@@ -240,7 +145,7 @@ export function HyperliquidCalculator({
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      localStorage.setItem(HYPERLIQUID_STORAGE_KEY, JSON.stringify(groups));
+      localStorage.setItem(BYBIT_STORAGE_KEY, JSON.stringify(groups));
     }, 500);
     return () => clearTimeout(timeout);
   }, [groups]);
@@ -253,7 +158,6 @@ export function HyperliquidCalculator({
             key={group.id}
             group={group}
             onUpdate={updateGroup}
-            moexBiasPercent={moexBiasPercent}
           />
         ))}
       </div>
