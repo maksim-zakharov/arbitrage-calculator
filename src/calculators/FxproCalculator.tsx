@@ -38,6 +38,14 @@ const initialPairs: FxproGroup[] = [
     ],
   },
   {
+    id: 'ED/EURUSD',
+    type: 'pair',
+    instruments: [
+      { name: 'ED', value: 100, ratio: 1 },
+      { name: 'EURUSD', value: 1, ratio: 0.01 },
+    ],
+  },
+  {
     id: 'GOLD/XAUUSD',
     type: 'pair',
     instruments: [
