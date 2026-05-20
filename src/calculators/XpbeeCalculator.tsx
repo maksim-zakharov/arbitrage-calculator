@@ -151,6 +151,30 @@ const initialPairs: CalculatorGroup[] = [
     ],
   },
   {
+    id: 'SOL/SOLUSD_xp',
+    type: 'pair',
+    instruments: [
+      { name: 'SOL', value: 1, ratio: 1 },
+      { name: 'SOLUSD_xp', value: 1, ratio: 1 },
+    ],
+  },
+  {
+    id: 'TRX/TRXUSD_xp',
+    type: 'pair',
+    instruments: [
+      { name: 'TRX', value: 1, ratio: 100 },
+      { name: 'TRXUSD_xp', value: 0.01, ratio: 1 },
+    ],
+  },
+  {
+    id: 'XRP/XRPUSD_xp',
+    type: 'pair',
+    instruments: [
+      { name: 'XRP', value: 100, ratio: 1 },
+      { name: 'XRPUSD_xp', value: 1, ratio: 0.01 },
+    ],
+  },
+  {
     id: 'BR/BRNUSD_xp',
     type: 'pair',
     instruments: [
