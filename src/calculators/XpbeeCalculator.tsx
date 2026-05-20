@@ -27,6 +27,9 @@ const moexIconMap: Record<string, string> = {
   NG: 'NG',
   COPPER: 'Co',
   NASD: 'NASDAQ100',
+  XRP: 'Ripple',
+  TRX: 'Tronn',
+  SOL: 'Solana'
 };
 
 const bybitMap: Record<string, string> = {
