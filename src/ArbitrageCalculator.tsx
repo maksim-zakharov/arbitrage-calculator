@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
-import { TypographyH4 } from './components/ui/typography';
+import { TypographyH3 } from './components/ui/typography';
 import { Slider } from './components/ui/slider';
 import { formatNumber, getFuturesSuffix, moneyFormat } from './utils';
 import { useGetMoexSecurityQuery } from './api';
@@ -158,7 +158,7 @@ export function ArbitrageCalculator() {
               SilverRate={SilverRate}
             />
           </div>
-          <TypographyH4>Калькулятор лотности для арбитража</TypographyH4>
+          <TypographyH3>Калькулятор лотности</TypographyH3>
           <div className="flex flex-col gap-2 py-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
             <span className="text-sm font-medium">Перевес на MOEX, %</span>
             <div className="flex items-center gap-3 w-full sm:w-auto sm:max-w-xs">
@@ -178,7 +178,7 @@ export function ArbitrageCalculator() {
           <Tabs
             value={tab}
             onValueChange={(value) => isValidTab(value) && setTab(value)}
-            className="flex flex-col flex-1 min-h-0 min-w-0"
+            className="flex flex-col flex-1 min-h-0 min-w-0 gap-1"
           >
             <TabsList className="shrink-0">
               <TabsTrigger value="xpbee">XPBEE</TabsTrigger>
@@ -186,22 +186,22 @@ export function ArbitrageCalculator() {
               <TabsTrigger value="fxpro">FXPRO</TabsTrigger>
               <TabsTrigger value="hyperliquid">Hyperliquid</TabsTrigger>
             </TabsList>
-            <TabsContent value="xpbee" className="flex-1 min-h-0 overflow-auto mt-2">
+            <TabsContent value="xpbee" className="flex-1 min-h-0 overflow-auto">
               <XpbeeCalculator
                 rates={{ EURRate, USDRate, CNYRate, GOLDRate, SilverRate }}
                 moexBiasPercent={moexBiasPercent}
               />
             </TabsContent>
-            <TabsContent value="bybit" className="flex-1 min-h-0 overflow-auto mt-2">
+            <TabsContent value="bybit" className="flex-1 min-h-0 overflow-auto">
               <BybitCalculator />
             </TabsContent>
-            <TabsContent value="fxpro" className="flex-1 min-h-0 overflow-auto mt-2">
+            <TabsContent value="fxpro" className="flex-1 min-h-0 overflow-auto">
               <FxproCalculator
                 rates={{ EURRate, USDRate, CNYRate, GOLDRate, SilverRate }}
                 moexBiasPercent={moexBiasPercent}
               />
             </TabsContent>
-            <TabsContent value="hyperliquid" className="flex-1 min-h-0 overflow-auto mt-2">
+            <TabsContent value="hyperliquid" className="flex-1 min-h-0 overflow-auto">
               <HyperliquidCalculator moexBiasPercent={moexBiasPercent} />
             </TabsContent>
           </Tabs>

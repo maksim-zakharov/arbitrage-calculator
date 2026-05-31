@@ -284,7 +284,7 @@ export function FxproCalculator({
   );
 
   return (
-    <div className="flex gap-2 flex-col flex-1">
+    <div className="flex gap-1 flex-col flex-1">
       <GroupSearchInput value={searchQuery} onChange={setSearchQuery} />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
         {visibleGroups.map((group) => (

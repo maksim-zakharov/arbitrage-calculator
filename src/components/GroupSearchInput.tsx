@@ -10,7 +10,7 @@ interface GroupSearchInputProps {
 
 export function GroupSearchInput({ value, onChange }: GroupSearchInputProps) {
   return (
-    <div className="relative sticky top-0 z-10 bg-background pb-2">
+    <div className="relative sticky top-0 z-10 bg-background">
       <Input
         type="text"
         placeholder="Поиск по тикеру, например GOLD"

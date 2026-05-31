@@ -587,7 +587,7 @@ export function XpbeeCalculator({ rates, moexBiasPercent }: XpbeeCalculatorProps
   );
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-1">
       <GroupSearchInput value={searchQuery} onChange={setSearchQuery} />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
         {visibleGroups.map((group) =>
