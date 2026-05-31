@@ -9,8 +9,12 @@ function Slider({
   value,
   min = 0,
   max = 100,
+  marks,
   ...props
-}: React.ComponentProps<typeof SliderPrimitive.Root>) {
+}: React.ComponentProps<typeof SliderPrimitive.Root> & {
+  /** Значения отсечек на шкале */
+  marks?: number[];
+}) {
   const _values = React.useMemo(
     () =>
       Array.isArray(value)
@@ -37,7 +41,7 @@ function Slider({
       <SliderPrimitive.Track
         data-slot="slider-track"
         className={cn(
-          "bg-muted relative grow overflow-hidden rounded-full data-[orientation=horizontal]:h-2 sm:data-[orientation=horizontal]:h-1.5 data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5"
+          "bg-muted relative grow overflow-visible rounded-full data-[orientation=horizontal]:h-2 sm:data-[orientation=horizontal]:h-1.5 data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5"
         )}
       >
         <SliderPrimitive.Range
@@ -46,6 +50,17 @@ function Slider({
             "bg-primary absolute data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full"
           )}
         />
+        {marks?.map((mark) => {
+          const position = ((mark - min) / (max - min)) * 100;
+          return (
+            <span
+              key={mark}
+              aria-hidden="true"
+              className="pointer-events-none absolute top-1/2 z-10 size-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-muted-foreground/50"
+              style={{ left: `${position}%` }}
+            />
+          );
+        })}
       </SliderPrimitive.Track>
       {Array.from({ length: _values.length }, (_, index) => (
         <SliderPrimitive.Thumb

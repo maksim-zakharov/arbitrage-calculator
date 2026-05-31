@@ -1,6 +1,7 @@
 {
-  "short_name": "Арбитражный калькулятор",
-  "name": "Арбитражный калькулятор",
+  "short_name": "Калькулятор лотности",
+  "name": "Калькулятор лотности — MOEX, XPBEE, BYBIT, FXPRO",
+  "description": "Онлайн-калькулятор лотности для арбитражных связок между MOEX и внешними площадками.",
   "icons": [
     {
       "src": "favicon.ico",
@@ -23,12 +24,13 @@
     "scope_url_host": "maksim-zakharov.github.io",
     "scope_url_path": "/arbitrage-calculator"
   },
-  "scope": "/",
+  "scope": "/arbitrage-calculator/",
   "handle_links": "preferred",
-  "start_url": "/arbitrage-calculator/#/diary",
+  "start_url": "/arbitrage-calculator/",
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#000000",
+  "lang": "ru",
   "related_applications": [
     {
       "platform": "webapp",

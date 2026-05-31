@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 import { TypographyH3 } from './components/ui/typography';
 import { Slider } from './components/ui/slider';
-import { formatNumber, getFuturesSuffix, moneyFormat } from './utils';
+import { getFuturesSuffix, moneyFormat } from './utils';
 import { useGetMoexSecurityQuery } from './api';
 import { XpbeeCalculator } from './calculators/XpbeeCalculator';
 import { FxproCalculator } from './calculators/FxproCalculator';
@@ -130,7 +130,8 @@ export function ArbitrageCalculator() {
   const [moexBiasPercent, setMoexBiasPercent] = useState(() => {
     const saved = localStorage.getItem('arbitrageMoexBiasPercent');
     const n = saved ? parseFloat(saved) : 0;
-    return Number.isFinite(n) && n >= 0 && n <= 100 ? n : 0;
+    if (!Number.isFinite(n) || n < 0) return 0;
+    return Math.min(n, 20);
   });
 
   useEffect(() => {
@@ -148,7 +149,7 @@ export function ArbitrageCalculator() {
         >
           Котировки XPBee — актуальные данные и графики TradingView
         </a>
-        <div className="flex flex-col flex-1 min-h-0 gap-3 px-3 sm:px-4">
+        <main className="flex flex-col flex-1 min-h-0 gap-3 px-3 sm:px-4">
           <div className="pt-2">
             <RatesTicker
               EURRate={EURRate}
@@ -158,7 +159,7 @@ export function ArbitrageCalculator() {
               SilverRate={SilverRate}
             />
           </div>
-          <TypographyH3>Калькулятор лотности</TypographyH3>
+          <TypographyH3 as="h1">Калькулятор лотности</TypographyH3>
           <div className="flex flex-col gap-2 py-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
             <span className="text-sm font-medium">Перевес на MOEX, %</span>
             <div className="flex items-center gap-3 w-full sm:w-auto sm:max-w-xs">
@@ -167,11 +168,12 @@ export function ArbitrageCalculator() {
                 value={[moexBiasPercent]}
                 onValueChange={(v) => setMoexBiasPercent(v[0])}
                 min={0}
-                max={100}
+                max={20}
                 step={1}
+                marks={[5, 10, 15, 20]}
               />
               <span className="shrink-0 text-sm text-muted-foreground min-w-[3rem] text-right">
-                {formatNumber(moexBiasPercent)}%
+                {Math.round(moexBiasPercent)}%
               </span>
             </div>
           </div>
@@ -205,7 +207,7 @@ export function ArbitrageCalculator() {
               <HyperliquidCalculator moexBiasPercent={moexBiasPercent} />
             </TabsContent>
           </Tabs>
-        </div>
+        </main>
       </div>
       <a
         href="https://t.me/max_xchange"
