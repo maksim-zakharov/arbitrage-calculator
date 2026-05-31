@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Slider } from '../components/ui/slider';
 import { Input } from '../components/ui/input';
 import { TypographyH4 } from '../components/ui/typography';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { formatNumber, loadMergedGroups, sortGroupsByMoexLeg } from '../utils';
+import { GroupSearchInput } from '../components/GroupSearchInput';
+import { formatNumber, filterGroupsBySearch, loadMergedGroups, sortGroupsByMoexLeg } from '../utils';
 import { AlorLabel } from './XpbeeCalculator';
 
 interface Instrument {
@@ -292,10 +293,17 @@ export function HyperliquidCalculator({
     return () => clearTimeout(timeout);
   }, [groups]);
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const visibleGroups = useMemo(
+    () => filterGroupsBySearch(sortGroupsByMoexLeg(groups), searchQuery),
+    [groups, searchQuery]
+  );
+
   return (
     <div className="flex gap-2 flex-col flex-1">
+      <GroupSearchInput value={searchQuery} onChange={setSearchQuery} />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-        {sortGroupsByMoexLeg(groups).map((group) => (
+        {visibleGroups.map((group) => (
           <PairCard
             key={group.id}
             group={group}

@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Slider } from '../components/ui/slider';
 import { Input } from '../components/ui/input';
 import { TypographyH4 } from '../components/ui/typography';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { formatNumber, loadMergedGroups, sortGroupsByMoexLeg } from '../utils';
+import { GroupSearchInput } from '../components/GroupSearchInput';
+import { formatNumber, filterGroupsBySearch, loadMergedGroups, sortGroupsByMoexLeg } from '../utils';
 
 /** Маппинг тикеров MOEX на ключи иконок (Tinkoff CDN). */
 const moexIconMap: Record<string, string> = {
@@ -579,9 +580,17 @@ export function XpbeeCalculator({ rates, moexBiasPercent }: XpbeeCalculatorProps
     return () => clearTimeout(timeout);
   }, [groups]);
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const visibleGroups = useMemo(
+    () => filterGroupsBySearch(sortGroupsByMoexLeg(groups), searchQuery),
+    [groups, searchQuery]
+  );
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-      {sortGroupsByMoexLeg(groups).map((group) =>
+    <div className="flex flex-col gap-2">
+      <GroupSearchInput value={searchQuery} onChange={setSearchQuery} />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+        {visibleGroups.map((group) =>
         group.type === 'pair' ? (
           <PairCalculator
             key={group.id}
@@ -598,6 +607,7 @@ export function XpbeeCalculator({ rates, moexBiasPercent }: XpbeeCalculatorProps
           />
         )
       )}
+      </div>
     </div>
   );
 }

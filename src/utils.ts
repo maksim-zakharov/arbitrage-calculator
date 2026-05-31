@@ -185,3 +185,27 @@ export function sortGroupsByMoexLeg<T extends SortableGroup>(groups: T[]): T[] {
         return leftGroup.id.localeCompare(rightGroup.id, 'ru-RU');
     });
 }
+
+/**
+ * Фильтрует группы по id и именам инструментов (без учёта регистра).
+ */
+export function filterGroupsBySearch<T extends SortableGroup>(
+    groups: T[],
+    query: string,
+): T[] {
+    const normalized = query.trim().toLowerCase();
+    if (!normalized) {
+        return groups;
+    }
+
+    return groups.filter((group) => {
+        const searchable = [
+            group.id,
+            ...group.instruments.map((instrument) => instrument.name),
+        ]
+            .join(' ')
+            .toLowerCase();
+
+        return searchable.includes(normalized);
+    });
+}

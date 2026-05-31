@@ -158,7 +158,7 @@ export function ArbitrageCalculator() {
               SilverRate={SilverRate}
             />
           </div>
-          <TypographyH4>Калькулятор лотности для арбитража (XPBEE)</TypographyH4>
+          <TypographyH4>Калькулятор лотности для арбитража</TypographyH4>
           <div className="flex flex-col gap-2 py-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
             <span className="text-sm font-medium">Перевес на MOEX, %</span>
             <div className="flex items-center gap-3 w-full sm:w-auto sm:max-w-xs">
