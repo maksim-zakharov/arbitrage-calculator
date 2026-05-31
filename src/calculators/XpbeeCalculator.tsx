@@ -3,7 +3,6 @@ import { Slider } from '../components/ui/slider';
 import { Input } from '../components/ui/input';
 import { TypographyH4 } from '../components/ui/typography';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { GroupSearchInput } from '../components/GroupSearchInput';
 import { formatNumber, filterGroupsBySearch, loadMergedGroups, sortGroupsByMoexLeg } from '../utils';
 
 /** Маппинг тикеров MOEX на ключи иконок (Tinkoff CDN). */
@@ -347,8 +346,8 @@ const PairCalculator = ({
       <CardContent className="p-2">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-2">
           {instruments.map((inst, index) => (
-            <label key={index} className="text-sm">
-              {inst.name}:
+            <label key={index} className="flex flex-col gap-2 text-sm">
+              <span className="font-semibold">{inst.name}</span>
               <Input
                 type="text"
                 inputMode="decimal"
@@ -459,8 +458,8 @@ const TripleCalculator = ({
       <CardContent className="p-2">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mt-2 mb-2">
           {instruments.map((inst, index) => (
-            <label key={index} className="text-sm">
-              {inst.name}:
+            <label key={index} className="flex flex-col gap-2 text-sm">
+              <span className="font-semibold">{inst.name}</span>
               <Input
                 type="text"
                 inputMode="decimal"
@@ -503,9 +502,14 @@ export interface XpbeeRates {
 interface XpbeeCalculatorProps {
   rates: XpbeeRates;
   moexBiasPercent: number;
+  searchQuery: string;
 }
 
-export function XpbeeCalculator({ rates, moexBiasPercent }: XpbeeCalculatorProps) {
+export function XpbeeCalculator({
+  rates,
+  moexBiasPercent,
+  searchQuery,
+}: XpbeeCalculatorProps) {
   const { EURRate, USDRate, CNYRate, GOLDRate, SilverRate } = rates;
 
   const [groups, setGroups] = useState<CalculatorGroup[]>(() =>
@@ -580,16 +584,13 @@ export function XpbeeCalculator({ rates, moexBiasPercent }: XpbeeCalculatorProps
     return () => clearTimeout(timeout);
   }, [groups]);
 
-  const [searchQuery, setSearchQuery] = useState('');
   const visibleGroups = useMemo(
     () => filterGroupsBySearch(sortGroupsByMoexLeg(groups), searchQuery),
     [groups, searchQuery]
   );
 
   return (
-    <div className="flex flex-col gap-1">
-      <GroupSearchInput value={searchQuery} onChange={setSearchQuery} />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
         {visibleGroups.map((group) =>
         group.type === 'pair' ? (
           <PairCalculator
@@ -607,7 +608,6 @@ export function XpbeeCalculator({ rates, moexBiasPercent }: XpbeeCalculatorProps
           />
         )
       )}
-      </div>
     </div>
   );
 }

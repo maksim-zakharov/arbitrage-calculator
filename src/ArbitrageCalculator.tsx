@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { GroupSearchInput } from './components/GroupSearchInput';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 import { TypographyH3 } from './components/ui/typography';
 import { Slider } from './components/ui/slider';
@@ -17,6 +18,13 @@ type TabValue = (typeof TAB_VALUES)[number];
 function isValidTab(value: string | null): value is TabValue {
   return value !== null && TAB_VALUES.includes(value as TabValue);
 }
+
+const EMPTY_TAB_SEARCH: Record<TabValue, string> = {
+  xpbee: '',
+  bybit: '',
+  fxpro: '',
+  hyperliquid: '',
+};
 
 interface RatesTickerProps {
   EURRate?: number | null;
@@ -138,6 +146,15 @@ export function ArbitrageCalculator() {
     localStorage.setItem('arbitrageMoexBiasPercent', String(moexBiasPercent));
   }, [moexBiasPercent]);
 
+  const [tabSearchQueries, setTabSearchQueries] =
+    useState<Record<TabValue, string>>(EMPTY_TAB_SEARCH);
+
+  const searchQuery = tabSearchQueries[tab];
+
+  const setSearchQuery = (value: string) => {
+    setTabSearchQueries((prev) => ({ ...prev, [tab]: value }));
+  };
+
   return (
     <>
       <div className="flex flex-col h-dvh pb-[env(safe-area-inset-bottom)]">
@@ -180,31 +197,42 @@ export function ArbitrageCalculator() {
           <Tabs
             value={tab}
             onValueChange={(value) => isValidTab(value) && setTab(value)}
-            className="flex flex-col flex-1 min-h-0 min-w-0 gap-1"
+            className="flex flex-col flex-1 min-h-0 min-w-0"
           >
-            <TabsList className="shrink-0">
-              <TabsTrigger value="xpbee">XPBEE</TabsTrigger>
-              <TabsTrigger value="bybit">BYBIT</TabsTrigger>
-              <TabsTrigger value="fxpro">FXPRO</TabsTrigger>
-              <TabsTrigger value="hyperliquid">Hyperliquid</TabsTrigger>
-            </TabsList>
+            <div className="sticky top-0 z-20 -mx-3 sm:-mx-4 shrink-0 bg-background px-3 sm:px-4 pb-0 flex flex-col gap-1">
+              <TabsList className="shrink-0">
+                <TabsTrigger value="xpbee">XPBEE</TabsTrigger>
+                <TabsTrigger value="bybit">BYBIT</TabsTrigger>
+                <TabsTrigger value="fxpro">FXPRO</TabsTrigger>
+                <TabsTrigger value="hyperliquid">Hyperliquid</TabsTrigger>
+              </TabsList>
+              <GroupSearchInput
+                value={searchQuery}
+                onChange={setSearchQuery}
+              />
+            </div>
             <TabsContent value="xpbee" className="flex-1 min-h-0 overflow-auto">
               <XpbeeCalculator
                 rates={{ EURRate, USDRate, CNYRate, GOLDRate, SilverRate }}
                 moexBiasPercent={moexBiasPercent}
+                searchQuery={searchQuery}
               />
             </TabsContent>
             <TabsContent value="bybit" className="flex-1 min-h-0 overflow-auto">
-              <BybitCalculator />
+              <BybitCalculator searchQuery={searchQuery} />
             </TabsContent>
             <TabsContent value="fxpro" className="flex-1 min-h-0 overflow-auto">
               <FxproCalculator
                 rates={{ EURRate, USDRate, CNYRate, GOLDRate, SilverRate }}
                 moexBiasPercent={moexBiasPercent}
+                searchQuery={searchQuery}
               />
             </TabsContent>
             <TabsContent value="hyperliquid" className="flex-1 min-h-0 overflow-auto">
-              <HyperliquidCalculator moexBiasPercent={moexBiasPercent} />
+              <HyperliquidCalculator
+                moexBiasPercent={moexBiasPercent}
+                searchQuery={searchQuery}
+              />
             </TabsContent>
           </Tabs>
         </main>

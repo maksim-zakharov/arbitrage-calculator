@@ -3,7 +3,6 @@ import { Slider } from '../components/ui/slider';
 import { Input } from '../components/ui/input';
 import { TypographyH4 } from '../components/ui/typography';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { GroupSearchInput } from '../components/GroupSearchInput';
 import { formatNumber, filterGroupsBySearch, loadMergedGroups, sortGroupsByMoexLeg } from '../utils';
 import { AlorLabel } from './XpbeeCalculator';
 
@@ -224,8 +223,8 @@ function PairCard({ group, onUpdate, moexBiasPercent }: PairCardProps) {
       <CardContent className="p-2">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-2">
           {instruments.map((inst, index) => (
-            <label key={index} className="text-sm">
-              {inst.name}:
+            <label key={index} className="flex flex-col gap-2 text-sm">
+              <span className="font-semibold">{inst.name}</span>
               <Input
                 type="text"
                 inputMode="decimal"
@@ -260,6 +259,7 @@ function PairCard({ group, onUpdate, moexBiasPercent }: PairCardProps) {
 interface HyperliquidCalculatorProps {
   /** Перевес на MOEX, % (отображаемое значение MOEX-ноги = хранимое × (1 + moexBiasPercent/100)). */
   moexBiasPercent: number;
+  searchQuery: string;
 }
 
 /**
@@ -267,6 +267,7 @@ interface HyperliquidCalculatorProps {
  */
 export function HyperliquidCalculator({
   moexBiasPercent,
+  searchQuery,
 }: HyperliquidCalculatorProps) {
   const [groups, setGroups] = useState<HyperliquidPair[]>(() => {
     migrateHyperliquidStorage();
@@ -293,16 +294,13 @@ export function HyperliquidCalculator({
     return () => clearTimeout(timeout);
   }, [groups]);
 
-  const [searchQuery, setSearchQuery] = useState('');
   const visibleGroups = useMemo(
     () => filterGroupsBySearch(sortGroupsByMoexLeg(groups), searchQuery),
     [groups, searchQuery]
   );
 
   return (
-    <div className="flex gap-1 flex-col flex-1">
-      <GroupSearchInput value={searchQuery} onChange={setSearchQuery} />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
         {visibleGroups.map((group) => (
           <PairCard
             key={group.id}
@@ -311,7 +309,6 @@ export function HyperliquidCalculator({
             moexBiasPercent={moexBiasPercent}
           />
         ))}
-      </div>
     </div>
   );
 }

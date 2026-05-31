@@ -3,7 +3,6 @@ import { Slider } from '../components/ui/slider';
 import { Input } from '../components/ui/input';
 import { TypographyH4 } from '../components/ui/typography';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { GroupSearchInput } from '../components/GroupSearchInput';
 import { formatNumber, filterGroupsBySearch, loadMergedGroups, sortGroupsByMoexLeg } from '../utils';
 import { AlorLabel } from './XpbeeCalculator';
 
@@ -95,8 +94,8 @@ function PairCard({ group, onUpdate }: PairCardProps) {
       <CardContent className="p-2">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-2">
           {instruments.map((inst, index) => (
-            <label key={index} className="text-sm">
-              {inst.name}:
+            <label key={index} className="flex flex-col gap-2 text-sm">
+              <span className="font-semibold">{inst.name}</span>
               <Input
                 type="text"
                 inputMode="decimal"
@@ -125,7 +124,7 @@ function PairCard({ group, onUpdate }: PairCardProps) {
 /**
  * Отдельный калькулятор для инструментов BYBIT.
  */
-export function BybitCalculator() {
+export function BybitCalculator({ searchQuery }: { searchQuery: string }) {
   const [groups, setGroups] = useState<BybitPair[]>(() =>
     loadMergedGroups(BYBIT_STORAGE_KEY, [...initialPairs])
   );
@@ -150,16 +149,13 @@ export function BybitCalculator() {
     return () => clearTimeout(timeout);
   }, [groups]);
 
-  const [searchQuery, setSearchQuery] = useState('');
   const visibleGroups = useMemo(
     () => filterGroupsBySearch(sortGroupsByMoexLeg(groups), searchQuery),
     [groups, searchQuery]
   );
 
   return (
-    <div className="flex gap-1 flex-col flex-1">
-      <GroupSearchInput value={searchQuery} onChange={setSearchQuery} />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
         {visibleGroups.map((group) => (
           <PairCard
             key={group.id}
@@ -167,7 +163,6 @@ export function BybitCalculator() {
             onUpdate={updateGroup}
           />
         ))}
-      </div>
     </div>
   );
 }

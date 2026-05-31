@@ -13,6 +13,7 @@
     --app-muted-fg: #9aa3a8;
     --app-border: #25282c;
     --app-input: #25282c;
+    --app-input-focus: #428bf9;
     --app-secondary: #161619;
     --app-accent: #161619;
     --app-primary: #eceeef;
@@ -118,6 +119,7 @@
     --color-destructive-foreground: var(--destructive-foreground);
     --color-border: var(--border);
     --color-input: var(--input);
+    --color-input-focus: var(--app-input-focus);
     --color-ring: var(--ring);
     --color-banner: var(--app-banner-bg);
     --color-banner-foreground: var(--app-banner-fg);
