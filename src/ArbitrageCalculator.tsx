@@ -159,12 +159,12 @@ export function ArbitrageCalculator() {
     <>
       <div className="flex flex-col h-dvh pb-[env(safe-area-inset-bottom)]">
         <a
-          className="shrink-0 flex w-full items-center justify-center border-b border-black/10 bg-white px-3 py-2 text-xs sm:text-sm text-center text-black hover:bg-neutral-100 transition-colors pt-[max(0.5rem,env(safe-area-inset-top))]"
-          href="https://crypto-spreads.ru/arbs-moex-cex?utm_source=calculator&utm_medium=link&utm_campaign=xpbee"
+          className="shrink-0 block w-full border-b border-black/10 bg-white px-3 py-2 text-xs sm:text-sm text-center text-black hover:bg-neutral-100 transition-colors pt-[max(0.5rem,env(safe-area-inset-top))]"
+          href="https://crypto-spreads.ru/?utm_source=calculator&utm_medium=link&utm_campaign=xpbee"
           target="_blank"
           rel="noopener noreferrer"
         >
-          Котировки XPBee — актуальные данные и графики TradingView
+          Скринер с котировками XPBEE — <span className="underline">попробовать сейчас</span>
         </a>
         <main className="flex flex-col flex-1 min-h-0 gap-3 px-3 sm:px-4">
           <div className="pt-2">
@@ -177,7 +177,7 @@ export function ArbitrageCalculator() {
             />
           </div>
           <TypographyH3 as="h1">Калькулятор лотности</TypographyH3>
-          <div className="flex flex-col gap-2 py-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+          <div className="flex flex-col кам py-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
             <span className="text-sm font-medium">Перевес на MOEX, %</span>
             <div className="flex items-center gap-3 w-full sm:flex-1 sm:min-w-0">
               <Slider
