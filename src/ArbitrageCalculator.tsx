@@ -34,6 +34,37 @@ interface RatesTickerProps {
   SilverRate?: number | null;
 }
 
+const RATE_PLACEHOLDER = '—';
+
+function isValidRate(value: number | null | undefined): value is number {
+  return value != null && Number.isFinite(value);
+}
+
+function formatTickerMoney(
+  value: number | null | undefined,
+  currency: string,
+  divisor = 1
+): string {
+  if (!isValidRate(value)) return RATE_PLACEHOLDER;
+  const result = value / divisor;
+  if (!Number.isFinite(result)) return RATE_PLACEHOLDER;
+  return moneyFormat(result, currency, 0, 2);
+}
+
+function formatCrossTicker(
+  numerator: number | null | undefined,
+  denominator: number | null | undefined,
+  currency: string,
+  scale = 1
+): string {
+  if (!isValidRate(numerator) || !isValidRate(denominator) || denominator === 0) {
+    return RATE_PLACEHOLDER;
+  }
+  const result = numerator / denominator / scale;
+  if (!Number.isFinite(result)) return RATE_PLACEHOLDER;
+  return moneyFormat(result, currency, 0, 2);
+}
+
 function RatesTickerItems({
   EURRate,
   USDRate,
@@ -45,43 +76,35 @@ function RatesTickerItems({
     <>
       <span className="inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap">
         <AlorLabel symbol="EUR" />
-        <span>{moneyFormat((EURRate ?? 0) / 1000, 'RUB', 0, 2)}</span>
+        <span>{formatTickerMoney(EURRate, 'RUB', 1000)}</span>
       </span>
       <span className="inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap">
         <AlorLabel symbol="USD" />
-        <span>{moneyFormat((USDRate ?? 0) / 1000, 'RUB', 0, 2)}</span>
+        <span>{formatTickerMoney(USDRate, 'RUB', 1000)}</span>
       </span>
       <span className="inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap">
         <AlorLabel symbol="CNY" />
-        <span>{moneyFormat(CNYRate ?? 0, 'RUB', 0, 2)}</span>
+        <span>{formatTickerMoney(CNYRate, 'RUB')}</span>
       </span>
       <span className="inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap">
         <AlorLabel symbol="UCNY" />
-        <span>
-          {moneyFormat((USDRate ?? 0) / (CNYRate ?? 1) / 1000, 'CNY', 0, 2)}
-        </span>
+        <span>{formatCrossTicker(USDRate, CNYRate, 'CNY', 1000)}</span>
       </span>
       <span className="inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap">
         <AlorLabel symbol="EURUSD" />
-        <span>{moneyFormat((EURRate ?? 0) / (USDRate ?? 1), 'USD', 0, 2)}</span>
+        <span>{formatCrossTicker(EURRate, USDRate, 'USD')}</span>
       </span>
       <span className="inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap">
         <AlorLabel symbol="EURCNY" />
-        <span>
-          {moneyFormat((EURRate ?? 0) / (CNYRate ?? 1) / 1000, 'CNY', 0, 2)}
-        </span>
+        <span>{formatCrossTicker(EURRate, CNYRate, 'CNY', 1000)}</span>
       </span>
       <span className="inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap">
         <AlorLabel symbol="GOLD" />
-        <span>
-          {GOLDRate != null ? moneyFormat(GOLDRate, 'USD', 0, 2) : '—'}
-        </span>
+        <span>{formatTickerMoney(GOLDRate, 'USD')}</span>
       </span>
       <span className="inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap">
         <AlorLabel symbol="SILV" />
-        <span>
-          {SilverRate != null ? moneyFormat(SilverRate, 'USD', 0, 2) : '—'}
-        </span>
+        <span>{formatTickerMoney(SilverRate, 'USD')}</span>
       </span>
     </>
   );
