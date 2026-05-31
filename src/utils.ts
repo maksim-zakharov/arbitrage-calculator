@@ -81,6 +81,95 @@ interface SortableGroup {
     instruments: SortableInstrument[];
 }
 
+export interface StoredInstrument {
+    /** Имя инструмента */
+    name: string;
+    /** Текущее значение лотности */
+    value: number;
+    /** Коэффициент пересчёта относительно базовой ноги */
+    ratio: number;
+}
+
+export interface StoredGroup {
+    /** Идентификатор группы (например ED/EURUSD_xp) */
+    id: string;
+    instruments: StoredInstrument[];
+}
+
+function cloneGroup<T extends StoredGroup>(group: T): T {
+    return {
+        ...group,
+        instruments: group.instruments.map((instrument) => ({ ...instrument })),
+    };
+}
+
+function mergeInstruments(
+    saved: StoredInstrument[] | undefined,
+    defaults: StoredInstrument[],
+): StoredInstrument[] {
+    if (!Array.isArray(saved)) {
+        return defaults.map((instrument) => ({ ...instrument }));
+    }
+
+    const savedByName = new Map(saved.map((instrument) => [instrument.name, instrument]));
+
+    return defaults.map((defaultInstrument) => {
+        const savedInstrument = savedByName.get(defaultInstrument.name);
+        if (!savedInstrument) {
+            return { ...defaultInstrument };
+        }
+
+        return {
+            name: defaultInstrument.name,
+            value: savedInstrument.value,
+            ratio: savedInstrument.ratio,
+        };
+    });
+}
+
+/**
+ * Загружает группы из localStorage и дополняет их новыми парами/тройками из дефолтного конфига.
+ * Сохранённые значения пользователя не теряются; удалённые из конфига группы не возвращаются.
+ */
+export function loadMergedGroups<T extends StoredGroup>(
+    storageKey: string,
+    defaults: T[],
+): T[] {
+    const raw = localStorage.getItem(storageKey);
+    if (!raw) {
+        return defaults.map(cloneGroup);
+    }
+
+    let saved: T[];
+    try {
+        saved = JSON.parse(raw);
+    } catch {
+        return defaults.map(cloneGroup);
+    }
+
+    if (!Array.isArray(saved)) {
+        return defaults.map(cloneGroup);
+    }
+
+    const savedById = new Map(
+        saved
+            .filter((group) => group && typeof group.id === 'string')
+            .map((group) => [group.id, group]),
+    );
+
+    return defaults.map((defaultGroup) => {
+        const savedGroup = savedById.get(defaultGroup.id);
+        if (!savedGroup) {
+            return cloneGroup(defaultGroup);
+        }
+
+        return {
+            ...defaultGroup,
+            instruments: mergeInstruments(savedGroup.instruments, defaultGroup.instruments),
+        };
+    });
+}
+
 /**
  * Унифицированная сортировка карточек по первой (MOEX) ноге.
  * Используется во всех вкладках калькуляторов для одинакового порядка.

@@ -3,7 +3,7 @@ import { Slider } from '../components/ui/slider';
 import { Input } from '../components/ui/input';
 import { TypographyH4 } from '../components/ui/typography';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { formatNumber, sortGroupsByMoexLeg } from '../utils';
+import { formatNumber, loadMergedGroups, sortGroupsByMoexLeg } from '../utils';
 import { AlorLabel } from './XpbeeCalculator';
 
 interface Instrument {
@@ -220,10 +220,9 @@ interface HyperliquidCalculatorProps {
 export function HyperliquidCalculator({
   moexBiasPercent,
 }: HyperliquidCalculatorProps) {
-  const [groups, setGroups] = useState<HyperliquidPair[]>(() => {
-    const saved = localStorage.getItem(HYPERLIQUID_STORAGE_KEY);
-    return saved ? JSON.parse(saved) : [...initialPairs];
-  });
+  const [groups, setGroups] = useState<HyperliquidPair[]>(() =>
+    loadMergedGroups(HYPERLIQUID_STORAGE_KEY, [...initialPairs])
+  );
 
   const updateGroup = (
     groupId: string,

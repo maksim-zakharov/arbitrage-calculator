@@ -3,7 +3,7 @@ import { Slider } from '../components/ui/slider';
 import { Input } from '../components/ui/input';
 import { TypographyH4 } from '../components/ui/typography';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { formatNumber, sortGroupsByMoexLeg } from '../utils';
+import { formatNumber, loadMergedGroups, sortGroupsByMoexLeg } from '../utils';
 
 /** Маппинг тикеров MOEX на ключи иконок (Tinkoff CDN). */
 const moexIconMap: Record<string, string> = {
@@ -507,10 +507,9 @@ interface XpbeeCalculatorProps {
 export function XpbeeCalculator({ rates, moexBiasPercent }: XpbeeCalculatorProps) {
   const { EURRate, USDRate, CNYRate, GOLDRate, SilverRate } = rates;
 
-  const [groups, setGroups] = useState<CalculatorGroup[]>(() => {
-    const saved = localStorage.getItem('arbitrageGroups');
-    return saved ? JSON.parse(saved) : [...initialPairs, ...initialTriples];
-  });
+  const [groups, setGroups] = useState<CalculatorGroup[]>(() =>
+    loadMergedGroups('arbitrageGroups', [...initialPairs, ...initialTriples])
+  );
 
   const updateGroup = (
     groupId: string,

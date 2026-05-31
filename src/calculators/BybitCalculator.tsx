@@ -3,7 +3,7 @@ import { Slider } from '../components/ui/slider';
 import { Input } from '../components/ui/input';
 import { TypographyH4 } from '../components/ui/typography';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { formatNumber, sortGroupsByMoexLeg } from '../utils';
+import { formatNumber, loadMergedGroups, sortGroupsByMoexLeg } from '../utils';
 import { AlorLabel } from './XpbeeCalculator';
 
 interface Instrument {
@@ -125,10 +125,9 @@ function PairCard({ group, onUpdate }: PairCardProps) {
  * Отдельный калькулятор для инструментов BYBIT.
  */
 export function BybitCalculator() {
-  const [groups, setGroups] = useState<BybitPair[]>(() => {
-    const saved = localStorage.getItem(BYBIT_STORAGE_KEY);
-    return saved ? JSON.parse(saved) : [...initialPairs];
-  });
+  const [groups, setGroups] = useState<BybitPair[]>(() =>
+    loadMergedGroups(BYBIT_STORAGE_KEY, [...initialPairs])
+  );
 
   const updateGroup = (
     groupId: string,

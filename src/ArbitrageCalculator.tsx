@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
-import { TypographyH2, TypographyH4 } from './components/ui/typography';
+import { TypographyH4 } from './components/ui/typography';
 import { Slider } from './components/ui/slider';
-import { Button } from './components/ui/button';
 import { formatNumber, getFuturesSuffix, moneyFormat } from './utils';
 import { useGetMoexSecurityQuery } from './api';
 import { XpbeeCalculator } from './calculators/XpbeeCalculator';
@@ -138,40 +137,19 @@ export function ArbitrageCalculator() {
     localStorage.setItem('arbitrageMoexBiasPercent', String(moexBiasPercent));
   }, [moexBiasPercent]);
 
-  const updateXpbee = () => {
-    localStorage.removeItem('arbitrageGroups');
-    window.location.reload();
-  };
-
   return (
-    <div className="flex flex-col gap-3 px-3 sm:px-4 h-dvh pb-[env(safe-area-inset-bottom)]">
-      <div className="flex flex-col gap-2 pt-2 sm:flex-row sm:items-start sm:justify-between">
-        <RatesTicker
-          EURRate={EURRate}
-          USDRate={USDRate}
-          CNYRate={CNYRate}
-          GOLDRate={GOLDRate}
-          SilverRate={SilverRate}
-        />
-        <a
-          className="flex shrink-0 gap-1 self-start bg-muted p-2 text-sm rounded-xl items-center"
-          href="https://t.me/max89701"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <div
-            className="img"
-            style={{ backgroundImage: 'url("/assets/telegram-48px.png")' }}
+    <>
+      <div className="flex flex-col gap-3 px-3 sm:px-4 h-dvh pb-[env(safe-area-inset-bottom)]">
+        <div className="pt-2">
+          <RatesTicker
+            EURRate={EURRate}
+            USDRate={USDRate}
+            CNYRate={CNYRate}
+            GOLDRate={GOLDRate}
+            SilverRate={SilverRate}
           />
-          Задать вопрос
-        </a>
-      </div>
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <TypographyH4>Калькулятор лотности для арбитража (XPBEE)</TypographyH4>
-        <Button className="self-start sm:self-auto" onClick={updateXpbee}>
-          Обновить
-        </Button>
-      </div>
+        </div>
+      <TypographyH4>Калькулятор лотности для арбитража (XPBEE)</TypographyH4>
       <div className="flex flex-col gap-2 py-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
         <span className="text-sm font-medium">Перевес на MOEX, %</span>
         <div className="flex items-center gap-3 w-full sm:w-auto sm:max-w-xs">
@@ -202,9 +180,9 @@ export function ArbitrageCalculator() {
       <Tabs
         value={tab}
         onValueChange={(value) => isValidTab(value) && setTab(value)}
-        className="flex flex-col flex-1 min-h-0"
+        className="flex flex-col flex-1 min-h-0 min-w-0"
       >
-        <TabsList>
+        <TabsList className="shrink-0">
           <TabsTrigger value="xpbee">XPBEE</TabsTrigger>
           <TabsTrigger value="bybit">BYBIT</TabsTrigger>
           <TabsTrigger value="fxpro">FXPRO</TabsTrigger>
@@ -229,6 +207,21 @@ export function ArbitrageCalculator() {
           <HyperliquidCalculator moexBiasPercent={moexBiasPercent} />
         </TabsContent>
       </Tabs>
-    </div>
+      </div>
+      <a
+        href="https://t.me/max89701"
+        target="_blank"
+        rel="noreferrer"
+        aria-label="Задать вопрос"
+        title="Задать вопрос"
+        className="fixed z-50 size-[42px] overflow-hidden rounded-full shadow-lg transition-transform hover:scale-105 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background bottom-[calc(1rem+env(safe-area-inset-bottom))] right-[calc(1rem+env(safe-area-inset-right,0px))]"
+      >
+        <div
+          className="size-full bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: 'url("/assets/telegram-48px.png")' }}
+          aria-hidden="true"
+        />
+      </a>
+    </>
   );
 }

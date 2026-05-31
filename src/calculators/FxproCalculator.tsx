@@ -3,7 +3,7 @@ import { Slider } from '../components/ui/slider';
 import { Input } from '../components/ui/input';
 import { TypographyH4 } from '../components/ui/typography';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { formatNumber, sortGroupsByMoexLeg } from '../utils';
+import { formatNumber, loadMergedGroups, sortGroupsByMoexLeg } from '../utils';
 import { AlorLabel, XpbeeRates } from './XpbeeCalculator';
 
 interface Instrument {
@@ -228,10 +228,9 @@ export function FxproCalculator({
 }: FxproCalculatorProps) {
   const { EURRate, CNYRate } = rates;
 
-  const [groups, setGroups] = useState<FxproGroup[]>(() => {
-    const saved = localStorage.getItem(FXPRO_STORAGE_KEY);
-    return saved ? JSON.parse(saved) : [...initialPairs];
-  });
+  const [groups, setGroups] = useState<FxproGroup[]>(() =>
+    loadMergedGroups(FXPRO_STORAGE_KEY, [...initialPairs])
+  );
 
   const updateGroup = (
     groupId: string,
