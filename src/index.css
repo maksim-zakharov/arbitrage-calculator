@@ -7,6 +7,29 @@
 @tailwind utilities;
 
 :root {
+    /* Базовые токены приложения */
+    --app-card: #101014;
+    --app-muted: #161619;
+    --app-muted-fg: #9aa3a8;
+    --app-border: #25282c;
+    --app-input: #25282c;
+    --app-secondary: #161619;
+    --app-accent: #161619;
+    --app-primary: #eceeef;
+    --app-primary-fg: #000000;
+    --app-ring: #4a5560;
+    --app-banner-bg: #ffffff;
+    --app-banner-fg: #000000;
+    --app-banner-border: rgb(0 0 0 / 0.1);
+    --app-banner-hover: #f5f5f5;
+    --app-slider-thumb: #ffffff;
+    --app-shadow: rgb(0 0 0 / 0.4);
+    --app-shadow-strong: rgb(0 0 0 / 0.45);
+    --app-telegram-ring: rgb(18 85 125 / 0.25);
+
+    --radius: 0.625rem;
+
+    /* Светлая тема */
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
     --card: oklch(1 0 0);
@@ -31,7 +54,6 @@
     --chart-3: oklch(0.398 0.07 227.392);
     --chart-4: oklch(0.828 0.189 84.429);
     --chart-5: oklch(0.769 0.188 70.08);
-    --radius: 0.625rem;
     --sidebar: oklch(0.985 0 0);
     --sidebar-foreground: oklch(0.145 0 0);
     --sidebar-primary: oklch(0.205 0 0);
@@ -43,38 +65,38 @@
 }
 
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.145 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.145 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.985 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
+    --background: #000000;
+    --foreground: #dbdbdb;
+    --card: var(--app-card);
+    --card-foreground: var(--foreground);
+    --popover: var(--app-card);
+    --popover-foreground: var(--foreground);
+    --primary: var(--app-primary);
+    --primary-foreground: var(--app-primary-fg);
+    --secondary: var(--app-secondary);
+    --secondary-foreground: var(--foreground);
+    --muted: var(--app-muted);
+    --muted-foreground: var(--app-muted-fg);
+    --accent: var(--app-accent);
+    --accent-foreground: var(--foreground);
     --destructive: oklch(0.396 0.141 25.723);
     --destructive-foreground: oklch(0.637 0.237 25.331);
-    --border: oklch(0.269 0 0);
-    --input: oklch(0.269 0 0);
-    --ring: oklch(0.439 0 0);
+    --border: var(--app-border);
+    --input: var(--app-input);
+    --ring: var(--app-ring);
     --chart-1: oklch(0.488 0.243 264.376);
     --chart-2: oklch(0.696 0.17 162.48);
     --chart-3: oklch(0.769 0.188 70.08);
     --chart-4: oklch(0.627 0.265 303.9);
     --chart-5: oklch(0.645 0.246 16.439);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar: var(--background);
+    --sidebar-foreground: var(--foreground);
     --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(0.269 0 0);
-    --sidebar-ring: oklch(0.439 0 0);
+    --sidebar-primary-foreground: var(--foreground);
+    --sidebar-accent: var(--app-muted);
+    --sidebar-accent-foreground: var(--foreground);
+    --sidebar-border: var(--app-border);
+    --sidebar-ring: var(--app-ring);
 }
 
 @theme inline {
@@ -97,6 +119,11 @@
     --color-border: var(--border);
     --color-input: var(--input);
     --color-ring: var(--ring);
+    --color-banner: var(--app-banner-bg);
+    --color-banner-foreground: var(--app-banner-fg);
+    --color-banner-border: var(--app-banner-border);
+    --color-banner-hover: var(--app-banner-hover);
+    --color-slider-thumb: var(--app-slider-thumb);
     --color-chart-1: var(--chart-1);
     --color-chart-2: var(--chart-2);
     --color-chart-3: var(--chart-3);
@@ -125,9 +152,7 @@
     }
 }
 
-
-
-.img{
+.img {
     width: 24px;
     height: 24px;
     flex-shrink: 0;
@@ -156,13 +181,15 @@
 }
 
 @keyframes telegram-fab-pulse {
-    0%, 100% {
+    0%,
+    100% {
         transform: scale(1);
-        box-shadow: 0 3px 10px rgb(0 0 0 / 0.4);
+        box-shadow: 0 3px 10px var(--app-shadow);
     }
     50% {
         transform: scale(1.03);
-        box-shadow: 0 3px 12px rgb(0 0 0 / 0.45), 0 0 0 1px rgb(18 85 125 / 0.25);
+        box-shadow: 0 3px 12px var(--app-shadow-strong),
+            0 0 0 1px var(--app-telegram-ring);
     }
 }
 
