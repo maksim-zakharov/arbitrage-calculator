@@ -121,7 +121,7 @@
         @apply border-border outline-ring/50;
     }
     body {
-        @apply bg-background text-foreground;
+        @apply bg-background text-foreground overflow-x-hidden;
     }
 }
 
@@ -130,6 +130,37 @@
 .img{
     width: 24px;
     height: 24px;
+    flex-shrink: 0;
     background-size: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
     border-radius: 50%;
+}
+
+.rates-ticker .img {
+    width: 16px;
+    height: 16px;
+}
+
+@keyframes rates-marquee {
+    from {
+        transform: translate3d(0, 0, 0);
+    }
+    to {
+        transform: translate3d(-50%, 0, 0);
+    }
+}
+
+.rates-marquee {
+    animation: rates-marquee 35s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rates-marquee-viewport {
+        overflow-x: auto;
+    }
+
+    .rates-marquee {
+        animation: none;
+    }
 }

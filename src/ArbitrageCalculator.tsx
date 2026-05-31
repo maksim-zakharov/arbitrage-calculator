@@ -19,6 +19,87 @@ function isValidTab(value: string | null): value is TabValue {
   return value !== null && TAB_VALUES.includes(value as TabValue);
 }
 
+interface RatesTickerProps {
+  EURRate?: number | null;
+  USDRate?: number | null;
+  CNYRate?: number | null;
+  GOLDRate?: number | null;
+  SilverRate?: number | null;
+}
+
+function RatesTickerItems({
+  EURRate,
+  USDRate,
+  CNYRate,
+  GOLDRate,
+  SilverRate,
+}: RatesTickerProps) {
+  return (
+    <>
+      <span className="inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap">
+        <AlorLabel symbol="EUR" />
+        <span>{moneyFormat((EURRate ?? 0) / 1000, 'RUB', 0, 2)}</span>
+      </span>
+      <span className="inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap">
+        <AlorLabel symbol="USD" />
+        <span>{moneyFormat((USDRate ?? 0) / 1000, 'RUB', 0, 2)}</span>
+      </span>
+      <span className="inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap">
+        <AlorLabel symbol="CNY" />
+        <span>{moneyFormat(CNYRate ?? 0, 'RUB', 0, 2)}</span>
+      </span>
+      <span className="inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap">
+        <AlorLabel symbol="UCNY" />
+        <span>
+          {moneyFormat((USDRate ?? 0) / (CNYRate ?? 1) / 1000, 'CNY', 0, 2)}
+        </span>
+      </span>
+      <span className="inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap">
+        <AlorLabel symbol="EURUSD" />
+        <span>{moneyFormat((EURRate ?? 0) / (USDRate ?? 1), 'USD', 0, 2)}</span>
+      </span>
+      <span className="inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap">
+        <AlorLabel symbol="EURCNY" />
+        <span>
+          {moneyFormat((EURRate ?? 0) / (CNYRate ?? 1) / 1000, 'CNY', 0, 2)}
+        </span>
+      </span>
+      <span className="inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap">
+        <AlorLabel symbol="GOLD" />
+        <span>
+          {GOLDRate != null ? moneyFormat(GOLDRate, 'USD', 0, 2) : '—'}
+        </span>
+      </span>
+      <span className="inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap">
+        <AlorLabel symbol="SILV" />
+        <span>
+          {SilverRate != null ? moneyFormat(SilverRate, 'USD', 0, 2) : '—'}
+        </span>
+      </span>
+    </>
+  );
+}
+
+function RatesTicker(props: RatesTickerProps) {
+  return (
+    <div className="rates-ticker">
+      <div className="rates-marquee-viewport sm:hidden overflow-hidden -mx-3">
+        <div className="rates-marquee flex w-max">
+          <div className="flex items-center gap-6 pr-6">
+            <RatesTickerItems {...props} />
+          </div>
+          <div className="flex items-center gap-6 pr-6" aria-hidden="true">
+            <RatesTickerItems {...props} />
+          </div>
+        </div>
+      </div>
+      <div className="hidden sm:flex sm:flex-wrap gap-4">
+        <RatesTickerItems {...props} />
+      </div>
+    </div>
+  );
+}
+
 export function ArbitrageCalculator() {
   const [searchParams, setSearchParams] = useSearchParams();
   const tab = useMemo(() => {
@@ -63,48 +144,17 @@ export function ArbitrageCalculator() {
   };
 
   return (
-    <div className="flex gap-2 flex-col pl-4 pr-4 h-screen">
-      <div className="flex flex-wrap justify-between pt-2 pb-2">
-        <div className="grid grid-cols-2 gap-6 md:flex md:flex-nowrap">
-          <span className="flex gap-1 align-middle">
-            <AlorLabel symbol="EUR" />{' '}
-            {moneyFormat((EURRate ?? 0) / 1000, 'RUB', 0, 2)}
-          </span>
-          <span className="flex gap-1">
-            <AlorLabel symbol="USD" />{' '}
-            {moneyFormat((USDRate ?? 0) / 1000, 'RUB', 0, 2)}
-          </span>
-          <span className="flex gap-1">
-            <AlorLabel symbol="CNY" /> {moneyFormat(CNYRate ?? 0, 'RUB', 0, 2)}
-          </span>
-          <span className="flex gap-1">
-            <AlorLabel symbol="UCNY" />{' '}
-            {moneyFormat((USDRate ?? 0) / (CNYRate ?? 1) / 1000, 'CNY', 0, 2)}
-          </span>
-          <span className="flex gap-1">
-            <AlorLabel symbol="EURUSD" />{' '}
-            {moneyFormat((EURRate ?? 0) / (USDRate ?? 1), 'USD', 0, 2)}
-          </span>
-          <span className="flex gap-1">
-            <AlorLabel symbol="EURCNY" />{' '}
-            {moneyFormat(
-              (EURRate ?? 0) / (CNYRate ?? 1) / 1000,
-              'CNY',
-              0,
-              2
-            )}
-          </span>
-          <span className="flex gap-1">
-            <AlorLabel symbol="GOLD" />{' '}
-            {GOLDRate != null ? moneyFormat(GOLDRate, 'USD', 0, 2) : '—'}
-          </span>
-          <span className="flex gap-1">
-            <AlorLabel symbol="SILV" />{' '}
-            {SilverRate != null ? moneyFormat(SilverRate, 'USD', 0, 2) : '—'}
-          </span>
-        </div>
+    <div className="flex flex-col gap-3 px-3 sm:px-4 h-dvh pb-[env(safe-area-inset-bottom)]">
+      <div className="flex flex-col gap-2 pt-2 sm:flex-row sm:items-start sm:justify-between">
+        <RatesTicker
+          EURRate={EURRate}
+          USDRate={USDRate}
+          CNYRate={CNYRate}
+          GOLDRate={GOLDRate}
+          SilverRate={SilverRate}
+        />
         <a
-          className="flex gap-1 bg-muted p-1 pl-2 pr-2 text-sm rounded-xl items-center"
+          className="flex shrink-0 gap-1 self-start bg-muted p-2 text-sm rounded-xl items-center"
           href="https://t.me/max89701"
           target="_blank"
           rel="noreferrer"
@@ -116,29 +166,33 @@ export function ArbitrageCalculator() {
           Задать вопрос
         </a>
       </div>
-      <div className="flex gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <TypographyH4>Калькулятор лотности для арбитража (XPBEE)</TypographyH4>
-        <Button onClick={updateXpbee}>Обновить</Button>
+        <Button className="self-start sm:self-auto" onClick={updateXpbee}>
+          Обновить
+        </Button>
       </div>
-      <div className="flex flex-wrap items-center gap-4 py-2">
+      <div className="flex flex-col gap-2 py-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
         <span className="text-sm font-medium">Перевес на MOEX, %</span>
-        <Slider
-          className="w-40"
-          value={[moexBiasPercent]}
-          onValueChange={(v) => setMoexBiasPercent(v[0])}
-          min={0}
-          max={100}
-          step={1}
-        />
-        <span className="text-sm text-muted-foreground">
-          {formatNumber(moexBiasPercent)}%
-        </span>
+        <div className="flex items-center gap-3 w-full sm:w-auto sm:max-w-xs">
+          <Slider
+            className="flex-1"
+            value={[moexBiasPercent]}
+            onValueChange={(v) => setMoexBiasPercent(v[0])}
+            min={0}
+            max={100}
+            step={1}
+          />
+          <span className="shrink-0 text-sm text-muted-foreground min-w-[3rem] text-right">
+            {formatNumber(moexBiasPercent)}%
+          </span>
+        </div>
         <span className="text-xs text-muted-foreground">
           (только для пар/троек с ногой Форекс _xp)
         </span>
       </div>
       <a
-        className="flex gap-1 bg-muted p-2 text-sm rounded-xl items-center w-max"
+        className="flex gap-1 bg-muted p-2 text-xs sm:text-sm rounded-xl items-center"
         href="https://crypto-spreads.ru/arbs-moex-cex?utm_source=calculator&utm_medium=link&utm_campaign=xpbee"
         target="_blank"
         rel="noopener noreferrer"

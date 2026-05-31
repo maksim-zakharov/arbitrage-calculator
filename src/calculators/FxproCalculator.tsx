@@ -174,12 +174,14 @@ function PairCard({ group, onUpdate, moexBiasPercent }: PairCardProps) {
       </CardHeader>
       <CardContent className="p-2">
         <div
-          className={`grid ${
-            instruments.length === 3 ? 'grid-cols-3' : 'grid-cols-2'
-          } gap-4 mb-2`}
+          className={`grid gap-3 sm:gap-4 mb-2 ${
+            instruments.length === 3
+              ? 'grid-cols-1 sm:grid-cols-3'
+              : 'grid-cols-1 sm:grid-cols-2'
+          }`}
         >
           {instruments.map((inst, index) => (
-            <label key={index}>
+            <label key={index} className="text-sm">
               {inst.name}:
               <Input
                 type="text"

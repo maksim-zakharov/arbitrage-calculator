@@ -46,7 +46,7 @@ export const AlorLabel = ({ symbol }: { symbol: string }) => {
     const [left] = parts;
     const keyLeft = moexIconMap[left];
     return (
-      <div className="flex gap-1 items-center flex-wrap">
+      <div className="inline-flex gap-1 items-center flex-wrap">
         {keyLeft && (
           <div className="img" style={{ backgroundImage: tinkoffIconUrl(keyLeft) }} />
         )}
@@ -69,7 +69,7 @@ export const AlorLabel = ({ symbol }: { symbol: string }) => {
   }
 
   return (
-    <div className="flex gap-1 items-center">
+    <div className="inline-flex gap-1 items-center">
       {backgroundImage && <div className="img" style={{ backgroundImage }} />}
       {symbol}
     </div>
@@ -344,9 +344,9 @@ const PairCalculator = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="p-2">
-        <div className="grid grid-cols-2 gap-4 mb-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-2">
           {instruments.map((inst, index) => (
-            <label key={index}>
+            <label key={index} className="text-sm">
               {inst.name}:
               <Input
                 type="text"
@@ -456,9 +456,9 @@ const TripleCalculator = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="p-2">
-        <div className="grid grid-cols-3 gap-4 mt-2 mb-2">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mt-2 mb-2">
           {instruments.map((inst, index) => (
-            <label key={index}>
+            <label key={index} className="text-sm">
               {inst.name}:
               <Input
                 type="text"
