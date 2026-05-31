@@ -179,7 +179,7 @@ export function ArbitrageCalculator() {
           <TypographyH3 as="h1">Калькулятор лотности</TypographyH3>
           <div className="flex flex-col gap-2 py-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
             <span className="text-sm font-medium">Перевес на MOEX, %</span>
-            <div className="flex items-center gap-3 w-full sm:w-auto sm:max-w-xs">
+            <div className="flex items-center gap-3 w-full sm:flex-1 sm:min-w-0">
               <Slider
                 className="flex-1"
                 value={[moexBiasPercent]}
