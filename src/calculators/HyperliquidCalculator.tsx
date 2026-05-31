@@ -20,72 +20,119 @@ interface HyperliquidPair {
 
 const HYPERLIQUID_STORAGE_KEY = 'hyperliquidGroups';
 
+/** Маппинг старых id групп (до перехода на префикс xyz:). */
+const LEGACY_GROUP_ID_MAP: Record<string, string> = {
+  'BR/BRENTOIL-USDC': 'BR/xyz:BRENTOIL',
+  'NG/NATGAS-USDC': 'NG/xyz:NATGAS',
+  'ED/EURUSD-USDC': 'ED/xyz:EURUSD',
+  'GOLD/GOLD-USDC': 'GOLD/xyz:GOLD',
+  'SILV/SILVER-USDC': 'SILV/xyz:SILVER',
+  'PLD/PALLADIUM-USDC': 'PLD/xyz:PALLADIUM',
+  'PLT/PLATINUM-USDC': 'PLT/xyz:PLATINUM',
+  'NASD/XYZ100': 'NASD/xyz:XYZ100',
+};
+
+/** Маппинг старых имён ног Hyperliquid. */
+const LEGACY_INSTRUMENT_NAME_MAP: Record<string, string> = {
+  'BRENTOIL-USDC': 'xyz:BRENTOIL',
+  'NATGAS-USDC': 'xyz:NATGAS',
+  'EURUSD-USDC': 'xyz:EURUSD',
+  'GOLD-USDC': 'xyz:GOLD',
+  'SILVER-USDC': 'xyz:SILVER',
+  'PALLADIUM-USDC': 'xyz:PALLADIUM',
+  'PLATINUM-USDC': 'xyz:PLATINUM',
+  XYZ100: 'xyz:XYZ100',
+};
+
 const initialPairs: HyperliquidPair[] = [
   {
-    id: 'BR/BRENTOIL-USDC',
+    id: 'BR/xyz:BRENTOIL',
     type: 'pair',
     instruments: [
       { name: 'BR', value: 1, ratio: 1 },
-      { name: 'BRENTOIL-USDC', value: 10, ratio: 10 },
+      { name: 'xyz:BRENTOIL', value: 10, ratio: 10 },
     ],
   },
   {
-    id: 'NG/NATGAS-USDC',
+    id: 'NG/xyz:NATGAS',
     type: 'pair',
     instruments: [
       { name: 'NG', value: 1, ratio: 1 },
-      { name: 'NATGAS-USDC', value: 100, ratio: 100 },
+      { name: 'xyz:NATGAS', value: 100, ratio: 100 },
     ],
   },
   {
-    id: 'ED/EURUSD-USDC',
+    id: 'ED/xyz:EURUSD',
     type: 'pair',
     instruments: [
       { name: 'ED', value: 1, ratio: 1 },
-      { name: 'EURUSD-USDC', value: 1000, ratio: 1000 },
+      { name: 'xyz:EURUSD', value: 1000, ratio: 1000 },
     ],
   },
   {
-    id: 'GOLD/GOLD-USDC',
+    id: 'GOLD/xyz:GOLD',
     type: 'pair',
     instruments: [
       { name: 'GOLD', value: 1, ratio: 1 },
-      { name: 'GOLD-USDC', value: 1, ratio: 10 },
+      { name: 'xyz:GOLD', value: 1, ratio: 10 },
     ],
   },
   {
-    id: 'SILV/SILVER-USDC',
+    id: 'SILV/xyz:SILVER',
     type: 'pair',
     instruments: [
       { name: 'SILV', value: 1, ratio: 1 },
-      { name: 'SILVER-USDC', value: 10, ratio: 10 },
+      { name: 'xyz:SILVER', value: 10, ratio: 10 },
     ],
   },
   {
-    id: 'PLD/PALLADIUM-USDC',
+    id: 'PLD/xyz:PALLADIUM',
     type: 'pair',
     instruments: [
       { name: 'PLD', value: 1, ratio: 1 },
-      { name: 'PALLADIUM-USDC', value: 1, ratio: 1 },
+      { name: 'xyz:PALLADIUM', value: 1, ratio: 1 },
     ],
   },
   {
-    id: 'PLT/PLATINUM-USDC',
+    id: 'PLT/xyz:PLATINUM',
     type: 'pair',
     instruments: [
       { name: 'PLT', value: 1, ratio: 1 },
-      { name: 'PLATINUM-USDC', value: 1, ratio: 1 },
+      { name: 'xyz:PLATINUM', value: 1, ratio: 1 },
     ],
   },
   {
-    id: 'NASD/XYZ100',
+    id: 'NASD/xyz:XYZ100',
     type: 'pair',
     instruments: [
       { name: 'NASD', value: 100, ratio: 1 },
-      { name: 'XYZ100', value: 1, ratio: 0.01 },
+      { name: 'xyz:XYZ100', value: 1, ratio: 0.01 },
     ],
   },
 ];
+
+function migrateHyperliquidStorage(): void {
+  const raw = localStorage.getItem(HYPERLIQUID_STORAGE_KEY);
+  if (!raw) return;
+
+  try {
+    const groups = JSON.parse(raw);
+    if (!Array.isArray(groups)) return;
+
+    const migrated = groups.map((group: HyperliquidPair) => ({
+      ...group,
+      id: LEGACY_GROUP_ID_MAP[group.id] ?? group.id,
+      instruments: group.instruments.map((instrument) => ({
+        ...instrument,
+        name: LEGACY_INSTRUMENT_NAME_MAP[instrument.name] ?? instrument.name,
+      })),
+    }));
+
+    localStorage.setItem(HYPERLIQUID_STORAGE_KEY, JSON.stringify(migrated));
+  } catch {
+    /* ignore corrupted storage */
+  }
+}
 
 const round2 = (n: number): number => Math.round(n * 100) / 100;
 
@@ -215,14 +262,15 @@ interface HyperliquidCalculatorProps {
 }
 
 /**
- * Калькулятор лотности для арбитража MOEX / Hyperliquid (пары USDC).
+ * Калькулятор лотности для арбитража MOEX / Hyperliquid (пары xyz:).
  */
 export function HyperliquidCalculator({
   moexBiasPercent,
 }: HyperliquidCalculatorProps) {
-  const [groups, setGroups] = useState<HyperliquidPair[]>(() =>
-    loadMergedGroups(HYPERLIQUID_STORAGE_KEY, [...initialPairs])
-  );
+  const [groups, setGroups] = useState<HyperliquidPair[]>(() => {
+    migrateHyperliquidStorage();
+    return loadMergedGroups(HYPERLIQUID_STORAGE_KEY, [...initialPairs]);
+  });
 
   const updateGroup = (
     groupId: string,

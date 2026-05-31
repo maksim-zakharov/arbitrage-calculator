@@ -155,12 +155,37 @@
     animation: rates-marquee 35s linear infinite;
 }
 
+@keyframes telegram-fab-pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 3px 10px rgb(0 0 0 / 0.4);
+    }
+    50% {
+        transform: scale(1.03);
+        box-shadow: 0 3px 12px rgb(0 0 0 / 0.45), 0 0 0 1px rgb(18 85 125 / 0.25);
+    }
+}
+
+.telegram-fab {
+    animation: telegram-fab-pulse 2.5s ease-in-out infinite;
+    filter: brightness(0.92);
+}
+
+.telegram-fab:hover {
+    animation-play-state: paused;
+    transform: scale(1.05);
+}
+
 @media (prefers-reduced-motion: reduce) {
     .rates-marquee-viewport {
         overflow-x: auto;
     }
 
     .rates-marquee {
+        animation: none;
+    }
+
+    .telegram-fab {
         animation: none;
     }
 }

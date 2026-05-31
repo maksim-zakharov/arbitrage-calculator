@@ -139,82 +139,81 @@ export function ArbitrageCalculator() {
 
   return (
     <>
-      <div className="flex flex-col gap-3 px-3 sm:px-4 h-dvh pb-[env(safe-area-inset-bottom)]">
-        <div className="pt-2">
-          <RatesTicker
-            EURRate={EURRate}
-            USDRate={USDRate}
-            CNYRate={CNYRate}
-            GOLDRate={GOLDRate}
-            SilverRate={SilverRate}
-          />
+      <div className="flex flex-col h-dvh pb-[env(safe-area-inset-bottom)]">
+        <a
+          className="shrink-0 flex w-full items-center justify-center border-b border-black/10 bg-white px-3 py-2 text-xs sm:text-sm text-center text-black hover:bg-neutral-100 transition-colors pt-[max(0.5rem,env(safe-area-inset-top))]"
+          href="https://crypto-spreads.ru/arbs-moex-cex?utm_source=calculator&utm_medium=link&utm_campaign=xpbee"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Котировки XPBee — актуальные данные и графики TradingView
+        </a>
+        <div className="flex flex-col flex-1 min-h-0 gap-3 px-3 sm:px-4">
+          <div className="pt-2">
+            <RatesTicker
+              EURRate={EURRate}
+              USDRate={USDRate}
+              CNYRate={CNYRate}
+              GOLDRate={GOLDRate}
+              SilverRate={SilverRate}
+            />
+          </div>
+          <TypographyH4>Калькулятор лотности для арбитража (XPBEE)</TypographyH4>
+          <div className="flex flex-col gap-2 py-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+            <span className="text-sm font-medium">Перевес на MOEX, %</span>
+            <div className="flex items-center gap-3 w-full sm:w-auto sm:max-w-xs">
+              <Slider
+                className="flex-1"
+                value={[moexBiasPercent]}
+                onValueChange={(v) => setMoexBiasPercent(v[0])}
+                min={0}
+                max={100}
+                step={1}
+              />
+              <span className="shrink-0 text-sm text-muted-foreground min-w-[3rem] text-right">
+                {formatNumber(moexBiasPercent)}%
+              </span>
+            </div>
+          </div>
+          <Tabs
+            value={tab}
+            onValueChange={(value) => isValidTab(value) && setTab(value)}
+            className="flex flex-col flex-1 min-h-0 min-w-0"
+          >
+            <TabsList className="shrink-0">
+              <TabsTrigger value="xpbee">XPBEE</TabsTrigger>
+              <TabsTrigger value="bybit">BYBIT</TabsTrigger>
+              <TabsTrigger value="fxpro">FXPRO</TabsTrigger>
+              <TabsTrigger value="hyperliquid">Hyperliquid</TabsTrigger>
+            </TabsList>
+            <TabsContent value="xpbee" className="flex-1 min-h-0 overflow-auto mt-2">
+              <XpbeeCalculator
+                rates={{ EURRate, USDRate, CNYRate, GOLDRate, SilverRate }}
+                moexBiasPercent={moexBiasPercent}
+              />
+            </TabsContent>
+            <TabsContent value="bybit" className="flex-1 min-h-0 overflow-auto mt-2">
+              <BybitCalculator />
+            </TabsContent>
+            <TabsContent value="fxpro" className="flex-1 min-h-0 overflow-auto mt-2">
+              <FxproCalculator
+                rates={{ EURRate, USDRate, CNYRate, GOLDRate, SilverRate }}
+                moexBiasPercent={moexBiasPercent}
+              />
+            </TabsContent>
+            <TabsContent value="hyperliquid" className="flex-1 min-h-0 overflow-auto mt-2">
+              <HyperliquidCalculator moexBiasPercent={moexBiasPercent} />
+            </TabsContent>
+          </Tabs>
         </div>
-      <TypographyH4>Калькулятор лотности для арбитража (XPBEE)</TypographyH4>
-      <div className="flex flex-col gap-2 py-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
-        <span className="text-sm font-medium">Перевес на MOEX, %</span>
-        <div className="flex items-center gap-3 w-full sm:w-auto sm:max-w-xs">
-          <Slider
-            className="flex-1"
-            value={[moexBiasPercent]}
-            onValueChange={(v) => setMoexBiasPercent(v[0])}
-            min={0}
-            max={100}
-            step={1}
-          />
-          <span className="shrink-0 text-sm text-muted-foreground min-w-[3rem] text-right">
-            {formatNumber(moexBiasPercent)}%
-          </span>
-        </div>
-        <span className="text-xs text-muted-foreground">
-          (только для пар/троек с ногой Форекс _xp)
-        </span>
       </div>
       <a
-        className="flex gap-1 bg-muted p-2 text-xs sm:text-sm rounded-xl items-center"
-        href="https://crypto-spreads.ru/arbs-moex-cex?utm_source=calculator&utm_medium=link&utm_campaign=xpbee"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Котировки XPBee — актуальные данные и графики TradingView
-      </a>
-      <Tabs
-        value={tab}
-        onValueChange={(value) => isValidTab(value) && setTab(value)}
-        className="flex flex-col flex-1 min-h-0 min-w-0"
-      >
-        <TabsList className="shrink-0">
-          <TabsTrigger value="xpbee">XPBEE</TabsTrigger>
-          <TabsTrigger value="bybit">BYBIT</TabsTrigger>
-          <TabsTrigger value="fxpro">FXPRO</TabsTrigger>
-          <TabsTrigger value="hyperliquid">Hyperliquid</TabsTrigger>
-        </TabsList>
-        <TabsContent value="xpbee" className="flex-1 min-h-0 overflow-auto mt-2">
-          <XpbeeCalculator
-            rates={{ EURRate, USDRate, CNYRate, GOLDRate, SilverRate }}
-            moexBiasPercent={moexBiasPercent}
-          />
-        </TabsContent>
-        <TabsContent value="bybit" className="flex-1 min-h-0 overflow-auto mt-2">
-          <BybitCalculator />
-        </TabsContent>
-        <TabsContent value="fxpro" className="flex-1 min-h-0 overflow-auto mt-2">
-          <FxproCalculator
-            rates={{ EURRate, USDRate, CNYRate, GOLDRate, SilverRate }}
-            moexBiasPercent={moexBiasPercent}
-          />
-        </TabsContent>
-        <TabsContent value="hyperliquid" className="flex-1 min-h-0 overflow-auto mt-2">
-          <HyperliquidCalculator moexBiasPercent={moexBiasPercent} />
-        </TabsContent>
-      </Tabs>
-      </div>
-      <a
-        href="https://t.me/max89701"
+        href="https://t.me/max_xchange"
         target="_blank"
         rel="noreferrer"
         aria-label="Задать вопрос"
         title="Задать вопрос"
-        className="fixed z-50 size-[42px] overflow-hidden rounded-full shadow-lg transition-transform hover:scale-105 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background bottom-[calc(1rem+env(safe-area-inset-bottom))] right-[calc(1rem+env(safe-area-inset-right,0px))]"
+        className="telegram-fab fixed z-50 size-[50px] overflow-hidden rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background bottom-[calc(1rem+env(safe-area-inset-bottom))] right-[calc(1rem+env(safe-area-inset-right,0px))]"
       >
         <div
           className="size-full bg-cover bg-center bg-no-repeat"
