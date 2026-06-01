@@ -9,10 +9,9 @@ import { useGetMoexSecurityQuery } from './api';
 import { XpbeeCalculator } from './calculators/XpbeeCalculator';
 import { FxproCalculator } from './calculators/FxproCalculator';
 import { HyperliquidCalculator } from './calculators/HyperliquidCalculator';
-import { BybitCalculator } from './calculators/BybitCalculator';
 import { AlorLabel } from './calculators/XpbeeCalculator';
 
-const TAB_VALUES = ['xpbee', 'bybit', 'fxpro', 'hyperliquid'] as const;
+const TAB_VALUES = ['xpbee', 'fxpro', 'hyperliquid'] as const;
 type TabValue = (typeof TAB_VALUES)[number];
 
 function isValidTab(value: string | null): value is TabValue {
@@ -21,7 +20,6 @@ function isValidTab(value: string | null): value is TabValue {
 
 const EMPTY_TAB_SEARCH: Record<TabValue, string> = {
   xpbee: '',
-  bybit: '',
   fxpro: '',
   hyperliquid: '',
 };
@@ -225,7 +223,6 @@ export function ArbitrageCalculator() {
             <div className="sticky top-0 z-20 -mx-3 sm:-mx-4 shrink-0 bg-background px-3 sm:px-4 pb-0 flex flex-col gap-1">
               <TabsList className="shrink-0">
                 <TabsTrigger value="xpbee">XPBEE</TabsTrigger>
-                <TabsTrigger value="bybit">BYBIT</TabsTrigger>
                 <TabsTrigger value="fxpro">FXPRO</TabsTrigger>
                 <TabsTrigger value="hyperliquid">Hyperliquid</TabsTrigger>
               </TabsList>
@@ -240,9 +237,6 @@ export function ArbitrageCalculator() {
                 moexBiasPercent={moexBiasPercent}
                 searchQuery={searchQuery}
               />
-            </TabsContent>
-            <TabsContent value="bybit" className="flex-1 min-h-0 overflow-auto">
-              <BybitCalculator searchQuery={searchQuery} />
             </TabsContent>
             <TabsContent value="fxpro" className="flex-1 min-h-0 overflow-auto">
               <FxproCalculator
