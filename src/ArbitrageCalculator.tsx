@@ -4,7 +4,7 @@ import { GroupSearchInput } from "./components/GroupSearchInput";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 import { TypographyH3 } from "./components/ui/typography";
 import { Slider } from "./components/ui/slider";
-import { getFuturesSuffix, moneyFormat } from "./utils";
+import { getCocoaFuturesSecid, getFuturesSuffix, moneyFormat } from "./utils";
 import { useGetMoexSecurityQuery } from "./api";
 import { XpbeeCalculator } from "./calculators/XpbeeCalculator";
 import { FxproCalculator } from "./calculators/FxproCalculator";
@@ -13,9 +13,6 @@ import { AlorLabel } from "./calculators/XpbeeCalculator";
 
 const TAB_VALUES = ["xpbee", "fxpro", "hyperliquid"] as const;
 type TabValue = (typeof TAB_VALUES)[number];
-
-/** ISS-код актуального фьючерса какао (COCOA-8.26). */
-const MOEX_COCOA_SECID = "CCQ6";
 
 function isValidTab(value: string | null): value is TabValue {
   return value !== null && TAB_VALUES.includes(value as TabValue);
@@ -168,7 +165,7 @@ export function ArbitrageCalculator() {
   const { data: SilverRate } = useGetMoexSecurityQuery(`SV${suffix}`, {
     pollingInterval: 5000,
   });
-  const { data: CocoaRate } = useGetMoexSecurityQuery(MOEX_COCOA_SECID, {
+  const { data: CocoaRate } = useGetMoexSecurityQuery(getCocoaFuturesSecid(), {
     pollingInterval: 5000,
   });
 
