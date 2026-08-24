@@ -1,27 +1,30 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { GroupSearchInput } from './components/GroupSearchInput';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
-import { TypographyH3 } from './components/ui/typography';
-import { Slider } from './components/ui/slider';
-import { getFuturesSuffix, moneyFormat } from './utils';
-import { useGetMoexSecurityQuery } from './api';
-import { XpbeeCalculator } from './calculators/XpbeeCalculator';
-import { FxproCalculator } from './calculators/FxproCalculator';
-import { HyperliquidCalculator } from './calculators/HyperliquidCalculator';
-import { AlorLabel } from './calculators/XpbeeCalculator';
+import React, { useState, useEffect, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
+import { GroupSearchInput } from "./components/GroupSearchInput";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
+import { TypographyH3 } from "./components/ui/typography";
+import { Slider } from "./components/ui/slider";
+import { getFuturesSuffix, moneyFormat } from "./utils";
+import { useGetMoexSecurityQuery } from "./api";
+import { XpbeeCalculator } from "./calculators/XpbeeCalculator";
+import { FxproCalculator } from "./calculators/FxproCalculator";
+import { HyperliquidCalculator } from "./calculators/HyperliquidCalculator";
+import { AlorLabel } from "./calculators/XpbeeCalculator";
 
-const TAB_VALUES = ['xpbee', 'fxpro', 'hyperliquid'] as const;
+const TAB_VALUES = ["xpbee", "fxpro", "hyperliquid"] as const;
 type TabValue = (typeof TAB_VALUES)[number];
+
+/** ISS-код актуального фьючерса какао (COCOA-8.26). */
+const MOEX_COCOA_SECID = "CCQ6";
 
 function isValidTab(value: string | null): value is TabValue {
   return value !== null && TAB_VALUES.includes(value as TabValue);
 }
 
 const EMPTY_TAB_SEARCH: Record<TabValue, string> = {
-  xpbee: '',
-  fxpro: '',
-  hyperliquid: '',
+  xpbee: "",
+  fxpro: "",
+  hyperliquid: "",
 };
 
 interface RatesTickerProps {
@@ -30,9 +33,10 @@ interface RatesTickerProps {
   CNYRate?: number | null;
   GOLDRate?: number | null;
   SilverRate?: number | null;
+  CocoaRate?: number | null;
 }
 
-const RATE_PLACEHOLDER = '—';
+const RATE_PLACEHOLDER = "—";
 
 function isValidRate(value: number | null | undefined): value is number {
   return value != null && Number.isFinite(value);
@@ -41,7 +45,7 @@ function isValidRate(value: number | null | undefined): value is number {
 function formatTickerMoney(
   value: number | null | undefined,
   currency: string,
-  divisor = 1
+  divisor = 1,
 ): string {
   if (!isValidRate(value)) return RATE_PLACEHOLDER;
   const result = value / divisor;
@@ -53,9 +57,13 @@ function formatCrossTicker(
   numerator: number | null | undefined,
   denominator: number | null | undefined,
   currency: string,
-  scale = 1
+  scale = 1,
 ): string {
-  if (!isValidRate(numerator) || !isValidRate(denominator) || denominator === 0) {
+  if (
+    !isValidRate(numerator) ||
+    !isValidRate(denominator) ||
+    denominator === 0
+  ) {
     return RATE_PLACEHOLDER;
   }
   const result = numerator / denominator / scale;
@@ -69,40 +77,45 @@ function RatesTickerItems({
   CNYRate,
   GOLDRate,
   SilverRate,
+  CocoaRate,
 }: RatesTickerProps) {
   return (
     <>
       <span className="inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap">
         <AlorLabel symbol="EUR" />
-        <span>{formatTickerMoney(EURRate, 'RUB', 1000)}</span>
+        <span>{formatTickerMoney(EURRate, "RUB", 1000)}</span>
       </span>
       <span className="inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap">
         <AlorLabel symbol="USD" />
-        <span>{formatTickerMoney(USDRate, 'RUB', 1000)}</span>
+        <span>{formatTickerMoney(USDRate, "RUB", 1000)}</span>
       </span>
       <span className="inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap">
         <AlorLabel symbol="CNY" />
-        <span>{formatTickerMoney(CNYRate, 'RUB')}</span>
+        <span>{formatTickerMoney(CNYRate, "RUB")}</span>
       </span>
       <span className="inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap">
         <AlorLabel symbol="UCNY" />
-        <span>{formatCrossTicker(USDRate, CNYRate, 'CNY', 1000)}</span>
+        <span>{formatCrossTicker(USDRate, CNYRate, "CNY", 1000)}</span>
       </span>
       <span className="inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap">
         <AlorLabel symbol="EURUSD" />
-        <span>{formatCrossTicker(EURRate, USDRate, 'USD')}</span>
+        <span>{formatCrossTicker(EURRate, USDRate, "USD")}</span>
       </span>
       <span className="inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap">
         <AlorLabel symbol="EURCNY" />
-        <span>{formatCrossTicker(EURRate, CNYRate, 'CNY', 1000)}</span>
+        <span>{formatCrossTicker(EURRate, CNYRate, "CNY", 1000)}</span>
       </span>
       <span className="inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap">
         <AlorLabel symbol="GOLD" />
-        <span>{formatTickerMoney(GOLDRate, 'USD')}</span>
+        <span>{formatTickerMoney(GOLDRate, "USD")}</span>
       </span>
       <span className="inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap">
         <AlorLabel symbol="SILV" />
-        <span>{formatTickerMoney(SilverRate, 'USD')}</span>
+        <span>{formatTickerMoney(SilverRate, "USD")}</span>
+      </span>
+      <span className="inline-flex shrink-0 items-center gap-1.5 text-sm whitespace-nowrap">
+        <AlorLabel symbol="COCOA" />
+        <span>{formatTickerMoney(CocoaRate, "RUB")}</span>
       </span>
     </>
   );
@@ -131,8 +144,8 @@ function RatesTicker(props: RatesTickerProps) {
 export function ArbitrageCalculator() {
   const [searchParams, setSearchParams] = useSearchParams();
   const tab = useMemo(() => {
-    const value = searchParams.get('tab');
-    return isValidTab(value) ? value : 'xpbee';
+    const value = searchParams.get("tab");
+    return isValidTab(value) ? value : "xpbee";
   }, [searchParams]);
 
   const setTab = (value: TabValue) => {
@@ -155,16 +168,19 @@ export function ArbitrageCalculator() {
   const { data: SilverRate } = useGetMoexSecurityQuery(`SV${suffix}`, {
     pollingInterval: 5000,
   });
+  const { data: CocoaRate } = useGetMoexSecurityQuery(MOEX_COCOA_SECID, {
+    pollingInterval: 5000,
+  });
 
   const [moexBiasPercent, setMoexBiasPercent] = useState(() => {
-    const saved = localStorage.getItem('arbitrageMoexBiasPercent');
+    const saved = localStorage.getItem("arbitrageMoexBiasPercent");
     const n = saved ? parseFloat(saved) : 0;
     if (!Number.isFinite(n) || n < 0) return 0;
     return Math.min(n, 20);
   });
 
   useEffect(() => {
-    localStorage.setItem('arbitrageMoexBiasPercent', String(moexBiasPercent));
+    localStorage.setItem("arbitrageMoexBiasPercent", String(moexBiasPercent));
   }, [moexBiasPercent]);
 
   const [tabSearchQueries, setTabSearchQueries] =
@@ -181,11 +197,12 @@ export function ArbitrageCalculator() {
       <div className="flex flex-col h-dvh pb-[env(safe-area-inset-bottom)]">
         <a
           className="shrink-0 block w-full border-b border-black/10 bg-white px-3 py-2 text-xs sm:text-sm text-center text-black hover:bg-neutral-100 transition-colors pt-[max(0.5rem,env(safe-area-inset-top))]"
-          href="https://crypto-spreads.ru/?utm_source=calculator&utm_medium=link&utm_campaign=xpbee"
+          href="https://crypto-spreads.com/?utm_source=calculator&utm_medium=link&utm_campaign=xpbee"
           target="_blank"
           rel="noopener noreferrer"
         >
-          Скринер с котировками XPBEE — <span className="underline">попробовать сейчас</span>
+          Скринер с котировками XPBEE —{" "}
+          <span className="underline">попробовать сейчас</span>
         </a>
         <main className="flex flex-col flex-1 min-h-0 gap-3 px-3 sm:px-4">
           <div className="pt-2">
@@ -195,6 +212,7 @@ export function ArbitrageCalculator() {
               CNYRate={CNYRate}
               GOLDRate={GOLDRate}
               SilverRate={SilverRate}
+              CocoaRate={CocoaRate}
             />
           </div>
           <TypographyH3 as="h1">Калькулятор лотности</TypographyH3>
@@ -226,26 +244,40 @@ export function ArbitrageCalculator() {
                 <TabsTrigger value="fxpro">FXPRO</TabsTrigger>
                 <TabsTrigger value="hyperliquid">Hyperliquid</TabsTrigger>
               </TabsList>
-              <GroupSearchInput
-                value={searchQuery}
-                onChange={setSearchQuery}
-              />
+              <GroupSearchInput value={searchQuery} onChange={setSearchQuery} />
             </div>
             <TabsContent value="xpbee" className="flex-1 min-h-0 overflow-auto">
               <XpbeeCalculator
-                rates={{ EURRate, USDRate, CNYRate, GOLDRate, SilverRate }}
+                rates={{
+                  EURRate,
+                  USDRate,
+                  CNYRate,
+                  GOLDRate,
+                  SilverRate,
+                  CocoaRate,
+                }}
                 moexBiasPercent={moexBiasPercent}
                 searchQuery={searchQuery}
               />
             </TabsContent>
             <TabsContent value="fxpro" className="flex-1 min-h-0 overflow-auto">
               <FxproCalculator
-                rates={{ EURRate, USDRate, CNYRate, GOLDRate, SilverRate }}
+                rates={{
+                  EURRate,
+                  USDRate,
+                  CNYRate,
+                  GOLDRate,
+                  SilverRate,
+                  CocoaRate,
+                }}
                 moexBiasPercent={moexBiasPercent}
                 searchQuery={searchQuery}
               />
             </TabsContent>
-            <TabsContent value="hyperliquid" className="flex-1 min-h-0 overflow-auto">
+            <TabsContent
+              value="hyperliquid"
+              className="flex-1 min-h-0 overflow-auto"
+            >
               <HyperliquidCalculator
                 moexBiasPercent={moexBiasPercent}
                 searchQuery={searchQuery}

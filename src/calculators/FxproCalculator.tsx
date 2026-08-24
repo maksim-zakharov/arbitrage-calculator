@@ -1,10 +1,20 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Slider } from '../components/ui/slider';
-import { Input } from '../components/ui/input';
-import { TypographyH4 } from '../components/ui/typography';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { formatNumber, filterGroupsBySearch, loadMergedGroups, sortGroupsByMoexLeg } from '../utils';
-import { AlorLabel, XpbeeRates } from './XpbeeCalculator';
+import React, { useEffect, useMemo, useState } from "react";
+import { Slider } from "../components/ui/slider";
+import { Input } from "../components/ui/input";
+import { TypographyH4 } from "../components/ui/typography";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import {
+  formatNumber,
+  filterGroupsBySearch,
+  loadMergedGroups,
+  sortGroupsByMoexLeg,
+} from "../utils";
+import { AlorLabel, XpbeeRates } from "./XpbeeCalculator";
 
 interface Instrument {
   name: string;
@@ -14,76 +24,88 @@ interface Instrument {
 
 interface FxproGroup {
   id: string;
-  type: 'pair' | 'triple';
+  type: "pair" | "triple";
   instruments: Instrument[];
 }
 
-const FXPRO_STORAGE_KEY = 'fxproGroups';
+const FXPRO_STORAGE_KEY = "fxproGroups";
+
+/** 1000 контрактов MOEX COCOA = 1 лот FXPRO #Cocoa */
+const FXPRO_COCOA_LOT_PER_MOEX = 0.001;
 
 const initialPairs: FxproGroup[] = [
   {
-    id: 'BR/BRENT',
-    type: 'pair',
+    id: "BR/BRENT",
+    type: "pair",
     instruments: [
-      { name: 'BR', value: 100, ratio: 1 },
-      { name: 'BRENT', value: 1, ratio: 0.01 },
+      { name: "BR", value: 100, ratio: 1 },
+      { name: "BRENT", value: 1, ratio: 0.01 },
     ],
   },
   {
-    id: 'NG/NAT.GAS',
-    type: 'pair',
+    id: "NG/NAT.GAS",
+    type: "pair",
     instruments: [
-      { name: 'NG', value: 100, ratio: 1 },
-      { name: 'NAT.GAS', value: 1, ratio: 0.01 },
+      { name: "NG", value: 100, ratio: 1 },
+      { name: "NAT.GAS", value: 1, ratio: 0.01 },
     ],
   },
   {
-    id: 'ED/EURUSD',
-    type: 'pair',
+    id: "ED/EURUSD",
+    type: "pair",
     instruments: [
-      { name: 'ED', value: 100, ratio: 1 },
-      { name: 'EURUSD', value: 1, ratio: 0.01 },
+      { name: "ED", value: 100, ratio: 1 },
+      { name: "EURUSD", value: 1, ratio: 0.01 },
     ],
   },
   {
-    id: 'GOLD/XAUUSD',
-    type: 'pair',
+    id: "GOLD/XAUUSD",
+    type: "pair",
     instruments: [
-      { name: 'GOLD', value: 100, ratio: 1 },
-      { name: 'XAUUSD', value: 1, ratio: 0.01 },
+      { name: "GOLD", value: 100, ratio: 1 },
+      { name: "XAUUSD", value: 1, ratio: 0.01 },
     ],
   },
   {
-    id: 'SILV/XAGUSD',
-    type: 'pair',
+    id: "SILV/XAGUSD",
+    type: "pair",
     instruments: [
-      { name: 'SILV', value: 500, ratio: 1 },
-      { name: 'XAGUSD', value: 1, ratio: 0.002 },
+      { name: "SILV", value: 500, ratio: 1 },
+      { name: "XAGUSD", value: 1, ratio: 0.002 },
     ],
   },
   {
-    id: 'PLT/XPTUSD',
-    type: 'pair',
+    id: "PLT/XPTUSD",
+    type: "pair",
     instruments: [
-      { name: 'PLT', value: 100, ratio: 1 },
-      { name: 'XPTUSD', value: 1, ratio: 0.01 },
+      { name: "PLT", value: 100, ratio: 1 },
+      { name: "XPTUSD", value: 1, ratio: 0.01 },
     ],
   },
   {
-    id: 'PLD/XPDUSD',
-    type: 'pair',
+    id: "PLD/XPDUSD",
+    type: "pair",
     instruments: [
-      { name: 'PLD', value: 100, ratio: 1 },
-      { name: 'XPDUSD', value: 1, ratio: 0.01 },
+      { name: "PLD", value: 100, ratio: 1 },
+      { name: "XPDUSD", value: 1, ratio: 0.01 },
     ],
   },
   {
-    id: 'EU/CNY/EURCNH',
-    type: 'triple',
+    id: "EU/CNY/EURCNH",
+    type: "triple",
     instruments: [
-      { name: 'EU', value: 1, ratio: 1 },
-      { name: 'CNY', value: 8, ratio: 8 },
-      { name: 'EURCNH', value: 0.01, ratio: 0.01 },
+      { name: "EU", value: 1, ratio: 1 },
+      { name: "CNY", value: 8, ratio: 8 },
+      { name: "EURCNH", value: 0.01, ratio: 0.01 },
+    ],
+  },
+  {
+    id: "COCOA/SI/#Cocoa",
+    type: "triple",
+    instruments: [
+      { name: "COCOA", value: 10, ratio: 1 },
+      { name: "SI", value: 10, ratio: 1 },
+      { name: "#Cocoa", value: 0.01, ratio: 0.001 },
     ],
   },
 ];
@@ -93,14 +115,14 @@ const round2 = (n: number): number => Math.round(n * 100) / 100;
 const getDisplayValue = (
   inst: Instrument,
   index: number,
-  moexBiasPercent: number
+  moexBiasPercent: number,
 ): number =>
   index === 0 ? inst.value * (1 + moexBiasPercent / 100) : inst.value;
 
 const toStoredValue = (
   displayed: number,
   index: number,
-  moexBiasPercent: number
+  moexBiasPercent: number,
 ): number =>
   index === 0 ? displayed / (1 + moexBiasPercent / 100) : displayed;
 
@@ -113,7 +135,12 @@ interface PairCardProps {
 function PairCard({ group, onUpdate, moexBiasPercent }: PairCardProps) {
   const [instruments, setInstruments] = useState(group.instruments);
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
-  const [editingValue, setEditingValue] = useState('');
+  const [editingValue, setEditingValue] = useState("");
+
+  useEffect(() => {
+    if (focusedIndex !== null) return;
+    setInstruments(group.instruments);
+  }, [group.instruments, focusedIndex]);
 
   const handleChange = (index: number, val: string | number) => {
     const value = round2(parseFloat(String(val)));
@@ -137,13 +164,13 @@ function PairCard({ group, onUpdate, moexBiasPercent }: PairCardProps) {
   const handleFocus = (index: number) => {
     setFocusedIndex(index);
     setEditingValue(
-      formatNumber(getDisplayValue(instruments[index], index, moexBiasPercent))
+      formatNumber(getDisplayValue(instruments[index], index, moexBiasPercent)),
     );
   };
 
   const handleBlur = (index: number) => {
     if (focusedIndex === index) {
-      const normalized = editingValue.replace(',', '.');
+      const normalized = editingValue.replace(/\s/g, "").replace(",", ".");
       const parsed = parseFloat(normalized);
       if (!Number.isNaN(parsed) && parsed >= 0) {
         const stored = toStoredValue(parsed, index, moexBiasPercent);
@@ -153,11 +180,7 @@ function PairCard({ group, onUpdate, moexBiasPercent }: PairCardProps) {
     }
   };
 
-  const baseDisplayValue = getDisplayValue(
-    instruments[0],
-    0,
-    moexBiasPercent
-  );
+  const baseDisplayValue = getDisplayValue(instruments[0], 0, moexBiasPercent);
   const handleSliderChange = (values: number[]) => {
     const stored = values[0] / (1 + moexBiasPercent / 100);
     handleChange(0, round2(stored));
@@ -176,8 +199,8 @@ function PairCard({ group, onUpdate, moexBiasPercent }: PairCardProps) {
         <div
           className={`grid gap-3 sm:gap-4 mb-2 ${
             instruments.length === 3
-              ? 'grid-cols-1 sm:grid-cols-3'
-              : 'grid-cols-1 sm:grid-cols-2'
+              ? "grid-cols-1 sm:grid-cols-3"
+              : "grid-cols-1 sm:grid-cols-2"
           }`}
         >
           {instruments.map((inst, index) => (
@@ -190,7 +213,7 @@ function PairCard({ group, onUpdate, moexBiasPercent }: PairCardProps) {
                   focusedIndex === index
                     ? editingValue
                     : formatNumber(
-                        getDisplayValue(inst, index, moexBiasPercent)
+                        getDisplayValue(inst, index, moexBiasPercent),
                       )
                 }
                 onChange={(e) =>
@@ -206,7 +229,7 @@ function PairCard({ group, onUpdate, moexBiasPercent }: PairCardProps) {
           className="pt-2 pb-2"
           value={[baseDisplayValue]}
           onValueChange={handleSliderChange}
-          max={1000}
+          max={Math.max(1000, Math.ceil(instruments[0].ratio * 20))}
           step={1}
         />
       </CardContent>
@@ -228,48 +251,76 @@ export function FxproCalculator({
   moexBiasPercent,
   searchQuery,
 }: FxproCalculatorProps) {
-  const { EURRate, CNYRate } = rates;
+  const { EURRate, CNYRate, USDRate, CocoaRate } = rates;
 
   const [groups, setGroups] = useState<FxproGroup[]>(() =>
-    loadMergedGroups(FXPRO_STORAGE_KEY, [...initialPairs])
+    loadMergedGroups(FXPRO_STORAGE_KEY, [...initialPairs]),
   );
 
-  const updateGroup = (
-    groupId: string,
-    updatedInstruments: Instrument[]
-  ) => {
+  const updateGroup = (groupId: string, updatedInstruments: Instrument[]) => {
     setGroups((prev) =>
       prev.map((group) =>
         group.id === groupId
           ? { ...group, instruments: updatedInstruments }
-          : group
-      )
+          : group,
+      ),
     );
   };
 
   useEffect(() => {
-    if (EURRate == null || CNYRate == null) return;
-
-    const eurCny = EURRate / CNYRate / 1000;
     setGroups((prev) =>
       prev.map((group) => {
-        if (group.id !== 'EU/CNY/EURCNH') return group;
+        if (group.id === "EU/CNY/EURCNH") {
+          if (EURRate == null || CNYRate == null) return group;
 
-        const newInstruments = group.instruments.map((inst) => ({ ...inst }));
-        newInstruments[1].ratio = eurCny;
+          const eurCny = EURRate / CNYRate / 1000;
+          const newInstruments = group.instruments.map((inst) => ({ ...inst }));
+          newInstruments[1].ratio = eurCny;
 
-        const baseValue = newInstruments[0].value;
-        const baseRatio = newInstruments[0].ratio;
-        newInstruments.forEach((inst, i) => {
-          if (i !== 0) {
-            inst.value = round2(baseValue * (inst.ratio / baseRatio));
+          const baseValue = newInstruments[0].value;
+          const baseRatio = newInstruments[0].ratio;
+          newInstruments.forEach((inst, i) => {
+            if (i !== 0) {
+              inst.value = round2(baseValue * (inst.ratio / baseRatio));
+            }
+          });
+
+          return { ...group, instruments: newInstruments };
+        }
+
+        if (group.id === "COCOA/SI/#Cocoa") {
+          if (
+            group.instruments.length < 3 ||
+            USDRate == null ||
+            CocoaRate == null ||
+            CocoaRate === 0
+          ) {
+            return group;
           }
-        });
 
-        return { ...group, instruments: newInstruments };
-      })
+          const siCocoa = USDRate / CocoaRate;
+          if (!Number.isFinite(siCocoa) || siCocoa <= 0) return group;
+
+          const newInstruments = group.instruments.map((inst) => ({ ...inst }));
+          newInstruments[0].ratio = siCocoa;
+          newInstruments[1].ratio = 1;
+          newInstruments[2].ratio = siCocoa * FXPRO_COCOA_LOT_PER_MOEX;
+
+          const baseValue = newInstruments[1].value;
+          const baseRatio = newInstruments[1].ratio;
+          newInstruments.forEach((inst, i) => {
+            if (i !== 1) {
+              inst.value = round2(baseValue * (inst.ratio / baseRatio));
+            }
+          });
+
+          return { ...group, instruments: newInstruments };
+        }
+
+        return group;
+      }),
     );
-  }, [EURRate, CNYRate]);
+  }, [EURRate, CNYRate, USDRate, CocoaRate]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -280,19 +331,19 @@ export function FxproCalculator({
 
   const visibleGroups = useMemo(
     () => filterGroupsBySearch(sortGroupsByMoexLeg(groups), searchQuery),
-    [groups, searchQuery]
+    [groups, searchQuery],
   );
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
-        {visibleGroups.map((group) => (
-          <PairCard
-            key={group.id}
-            group={group}
-            onUpdate={updateGroup}
-            moexBiasPercent={moexBiasPercent}
-          />
-        ))}
+      {visibleGroups.map((group) => (
+        <PairCard
+          key={group.id}
+          group={group}
+          onUpdate={updateGroup}
+          moexBiasPercent={moexBiasPercent}
+        />
+      ))}
     </div>
   );
 }

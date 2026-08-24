@@ -1,35 +1,45 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Slider } from '../components/ui/slider';
-import { Input } from '../components/ui/input';
-import { TypographyH4 } from '../components/ui/typography';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { formatNumber, filterGroupsBySearch, loadMergedGroups, sortGroupsByMoexLeg } from '../utils';
+import React, { useEffect, useMemo, useState } from "react";
+import { Slider } from "../components/ui/slider";
+import { Input } from "../components/ui/input";
+import { TypographyH4 } from "../components/ui/typography";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import {
+  formatNumber,
+  filterGroupsBySearch,
+  loadMergedGroups,
+  sortGroupsByMoexLeg,
+} from "../utils";
 
 /** Маппинг тикеров MOEX на ключи иконок (Tinkoff CDN). */
 const moexIconMap: Record<string, string> = {
-  GOLD: 'GoldFut2',
-  GLDRUBF: 'GoldFut2',
-  SILV: 'SilverFut',
-  PLD: 'Palladium',
-  PLT: 'Platinum',
-  UCNY: 'USDCNY',
-  CNY: 'CNYRUR',
-  SI: 'USD1',
-  USD: 'USD1',
-  ED: 'EURUSD3',
-  EURUSD: 'EURUSD3',
-  EUR: 'EUR1',
-  EU: 'EUR1',
-  RUB: 'ruble',
-  ETH: 'Ethereum',
-  BTC: 'BITOK',
-  BR: 'OilFut',
-  NG: 'NG',
-  COPPER: 'Co',
-  NASD: 'NASDAQ100',
-  XRP: 'Ripple',
-  TRX: 'Tronn',
-  SOL: 'Solana'
+  GOLD: "GoldFut2",
+  GLDRUBF: "GoldFut2",
+  SILV: "SilverFut",
+  PLD: "Palladium",
+  PLT: "Platinum",
+  UCNY: "USDCNY",
+  CNY: "CNYRUR",
+  SI: "USD1",
+  USD: "USD1",
+  ED: "EURUSD3",
+  EURUSD: "EURUSD3",
+  EUR: "EUR1",
+  EU: "EUR1",
+  RUB: "ruble",
+  ETH: "Ethereum",
+  BTC: "BITOK",
+  BR: "OilFut",
+  NG: "NG",
+  COPPER: "Co",
+  NASD: "NASDAQ100",
+  XRP: "Ripple",
+  TRX: "Tronn",
+  SOL: "Solana",
 };
 
 const bybitMap: Record<string, string> = {
@@ -41,14 +51,17 @@ const tinkoffIconUrl = (key: string) =>
   `url("//invest-brands.cdn-tinkoff.ru/${key}x160.png")`;
 
 export const AlorLabel = ({ symbol }: { symbol: string }) => {
-  if (symbol.includes('/')) {
-    const parts = symbol.split('/');
+  if (symbol.includes("/")) {
+    const parts = symbol.split("/");
     const [left] = parts;
     const keyLeft = moexIconMap[left];
     return (
       <div className="inline-flex gap-1 items-center flex-wrap">
         {keyLeft && (
-          <div className="img" style={{ backgroundImage: tinkoffIconUrl(keyLeft) }} />
+          <div
+            className="img"
+            style={{ backgroundImage: tinkoffIconUrl(keyLeft) }}
+          />
         )}
         {parts.map((part, index) => (
           <React.Fragment key={`${symbol}-${part}-${index}`}>
@@ -60,11 +73,11 @@ export const AlorLabel = ({ symbol }: { symbol: string }) => {
     );
   }
 
-  const symbolParts = symbol.includes('-') ? symbol.split('-') : [symbol];
+  const symbolParts = symbol.includes("-") ? symbol.split("-") : [symbol];
   const key = moexIconMap[symbolParts[0]];
   let backgroundImage = key ? tinkoffIconUrl(key) : undefined;
-  if (symbolParts[1]?.includes('BYBIT')) {
-    const [, ticker] = symbolParts[1].split(':');
+  if (symbolParts[1]?.includes("BYBIT")) {
+    const [, ticker] = symbolParts[1].split(":");
     backgroundImage = bybitMap[ticker];
   }
 
@@ -84,174 +97,174 @@ interface Instrument {
 
 interface CalculatorGroup {
   id: string;
-  type: 'pair' | 'triple';
+  type: "pair" | "triple";
   instruments: Instrument[];
 }
 
 const initialPairs: CalculatorGroup[] = [
   {
-    id: 'ED/EURUSD_xp',
-    type: 'pair',
+    id: "ED/EURUSD_xp",
+    type: "pair",
     instruments: [
-      { name: 'ED', value: 1, ratio: 1 },
-      { name: 'EURUSD_xp', value: 0.01, ratio: 0.01 },
+      { name: "ED", value: 1, ratio: 1 },
+      { name: "EURUSD_xp", value: 0.01, ratio: 0.01 },
     ],
   },
   {
-    id: 'UCNY/USDCNH_xp',
-    type: 'pair',
+    id: "UCNY/USDCNH_xp",
+    type: "pair",
     instruments: [
-      { name: 'UCNY', value: 1, ratio: 1 },
-      { name: 'USDCNH_xp', value: 0.01, ratio: 0.01 },
+      { name: "UCNY", value: 1, ratio: 1 },
+      { name: "USDCNH_xp", value: 0.01, ratio: 0.01 },
     ],
   },
   {
-    id: 'GOLD/XAUUSD_xp',
-    type: 'pair',
+    id: "GOLD/XAUUSD_xp",
+    type: "pair",
     instruments: [
-      { name: 'GOLD', value: 1, ratio: 1 },
-      { name: 'XAUUSD_xp', value: 0.01, ratio: 0.01 },
+      { name: "GOLD", value: 1, ratio: 1 },
+      { name: "XAUUSD_xp", value: 0.01, ratio: 0.01 },
     ],
   },
   {
-    id: 'SILV/XAGUSD_xp',
-    type: 'pair',
+    id: "SILV/XAGUSD_xp",
+    type: "pair",
     instruments: [
-      { name: 'SILV', value: 5, ratio: 1 },
-      { name: 'XAGUSD_xp', value: 0.01, ratio: 0.002 },
+      { name: "SILV", value: 5, ratio: 1 },
+      { name: "XAGUSD_xp", value: 0.01, ratio: 0.002 },
     ],
   },
   {
-    id: 'PLT/XPTUSD_xp',
-    type: 'pair',
+    id: "PLT/XPTUSD_xp",
+    type: "pair",
     instruments: [
-      { name: 'PLT', value: 1, ratio: 1 },
-      { name: 'XPTUSD_xp', value: 0.01, ratio: 0.01 },
+      { name: "PLT", value: 1, ratio: 1 },
+      { name: "XPTUSD_xp", value: 0.01, ratio: 0.01 },
     ],
   },
   {
-    id: 'PLD/XPDUSD_xp',
-    type: 'pair',
+    id: "PLD/XPDUSD_xp",
+    type: "pair",
     instruments: [
-      { name: 'PLD', value: 1, ratio: 1 },
-      { name: 'XPDUSD_xp', value: 0.01, ratio: 0.01 },
+      { name: "PLD", value: 1, ratio: 1 },
+      { name: "XPDUSD_xp", value: 0.01, ratio: 0.01 },
     ],
   },
   {
-    id: 'BTC/BTCUSD_xp',
-    type: 'pair',
+    id: "BTC/BTCUSD_xp",
+    type: "pair",
     instruments: [
-      { name: 'BTC', value: 10, ratio: 10 },
-      { name: 'BTCUSD_xp', value: 0.01, ratio: 0.01 },
+      { name: "BTC", value: 10, ratio: 10 },
+      { name: "BTCUSD_xp", value: 0.01, ratio: 0.01 },
     ],
   },
   {
-    id: 'ETH/ETHUSD_xp',
-    type: 'pair',
+    id: "ETH/ETHUSD_xp",
+    type: "pair",
     instruments: [
-      { name: 'ETH', value: 100, ratio: 1 },
-      { name: 'ETHUSD_xp', value: 1, ratio: 0.01 },
+      { name: "ETH", value: 100, ratio: 1 },
+      { name: "ETHUSD_xp", value: 1, ratio: 0.01 },
     ],
   },
   {
-    id: 'SOL/SOLUSD_xp',
-    type: 'pair',
+    id: "SOL/SOLUSD_xp",
+    type: "pair",
     instruments: [
-      { name: 'SOL', value: 1, ratio: 1 },
-      { name: 'SOLUSD_xp', value: 1, ratio: 1 },
+      { name: "SOL", value: 1, ratio: 1 },
+      { name: "SOLUSD_xp", value: 1, ratio: 1 },
     ],
   },
   {
-    id: 'TRX/TRXUSD_xp',
-    type: 'pair',
+    id: "TRX/TRXUSD_xp",
+    type: "pair",
     instruments: [
-      { name: 'TRX', value: 1, ratio: 100 },
-      { name: 'TRXUSD_xp', value: 0.01, ratio: 1 },
+      { name: "TRX", value: 1, ratio: 100 },
+      { name: "TRXUSD_xp", value: 0.01, ratio: 1 },
     ],
   },
   {
-    id: 'XRP/XRPUSD_xp',
-    type: 'pair',
+    id: "XRP/XRPUSD_xp",
+    type: "pair",
     instruments: [
-      { name: 'XRP', value: 100, ratio: 1 },
-      { name: 'XRPUSD_xp', value: 1, ratio: 0.01 },
+      { name: "XRP", value: 100, ratio: 1 },
+      { name: "XRPUSD_xp", value: 1, ratio: 0.01 },
     ],
   },
   {
-    id: 'BR/BRNUSD_xp',
-    type: 'pair',
+    id: "BR/BRNUSD_xp",
+    type: "pair",
     instruments: [
-      { name: 'BR', value: 10, ratio: 1 },
-      { name: 'BRNUSD_xp', value: 0.1, ratio: 0.01 },
+      { name: "BR", value: 10, ratio: 1 },
+      { name: "BRNUSD_xp", value: 0.1, ratio: 0.01 },
     ],
   },
   {
-    id: 'NG/NGUSD_xp',
-    type: 'pair',
+    id: "NG/NGUSD_xp",
+    type: "pair",
     instruments: [
-      { name: 'NG', value: 100, ratio: 1 },
-      { name: 'NGUSD_xp', value: 1, ratio: 0.01 },
+      { name: "NG", value: 100, ratio: 1 },
+      { name: "NGUSD_xp", value: 1, ratio: 0.01 },
     ],
   },
   {
-    id: 'NASD/NDXUSD_xp',
-    type: 'pair',
+    id: "NASD/NDXUSD_xp",
+    type: "pair",
     instruments: [
-      { name: 'NASD', value: 1000, ratio: 1 },
-      { name: 'NDXUSD_xp', value: 1, ratio: 0.001 },
+      { name: "NASD", value: 1000, ratio: 1 },
+      { name: "NDXUSD_xp", value: 1, ratio: 0.001 },
     ],
   },
 ];
 
 const initialTriples: CalculatorGroup[] = [
   {
-    id: 'SI/CNY/USDCNH_xp',
-    type: 'triple',
+    id: "SI/CNY/USDCNH_xp",
+    type: "triple",
     instruments: [
-      { name: 'SI', value: 24, ratio: 1 },
-      { name: 'CNY', value: 170, ratio: 7.08 },
-      { name: 'USDCNH_xp', value: 0.24, ratio: 0.01 },
+      { name: "SI", value: 24, ratio: 1 },
+      { name: "CNY", value: 170, ratio: 7.08 },
+      { name: "USDCNH_xp", value: 0.24, ratio: 0.01 },
     ],
   },
   {
-    id: 'EU/SI/EURUSD_xp',
-    type: 'triple',
+    id: "EU/SI/EURUSD_xp",
+    type: "triple",
     instruments: [
-      { name: 'EU', value: 20, ratio: 1 },
-      { name: 'SI', value: 23, ratio: 1.15 },
-      { name: 'EURUSD_xp', value: 0.2, ratio: 0.01 },
+      { name: "EU", value: 20, ratio: 1 },
+      { name: "SI", value: 23, ratio: 1.15 },
+      { name: "EURUSD_xp", value: 0.2, ratio: 0.01 },
     ],
   },
   {
-    id: 'EU/CNY/EURCNH_xp',
-    type: 'triple',
+    id: "EU/CNY/EURCNH_xp",
+    type: "triple",
     instruments: [
-      { name: 'EU', value: 1, ratio: 1 },
-      { name: 'CNY', value: 8, ratio: 8 },
-      { name: 'EURCNH_xp', value: 0.01, ratio: 0.01 },
+      { name: "EU", value: 1, ratio: 1 },
+      { name: "CNY", value: 8, ratio: 8 },
+      { name: "EURCNH_xp", value: 0.01, ratio: 0.01 },
     ],
   },
   {
-    id: 'GLDRUBF/SI/GOLD',
-    type: 'triple',
+    id: "GLDRUBF/SI/GOLD",
+    type: "triple",
     instruments: [
-      { name: 'GLDRUBF', value: 31.1, ratio: 1 },
-      { name: 'SI', value: 0, ratio: 0 },
-      { name: 'GOLD', value: 1, ratio: 1 / 31.1 },
+      { name: "GLDRUBF", value: 31.1, ratio: 1 },
+      { name: "SI", value: 0, ratio: 0 },
+      { name: "GOLD", value: 1, ratio: 1 / 31.1 },
     ],
   },
 ];
 
 const groupHasForex = (group: { instruments: Instrument[] }): boolean =>
-  group.instruments.some((i) => i.name.endsWith('_xp'));
+  group.instruments.some((i) => i.name.endsWith("_xp"));
 
 const getDisplayValue = (
   inst: Instrument,
   group: { instruments: Instrument[] },
-  moexBiasPercent: number
+  moexBiasPercent: number,
 ): number => {
   if (!groupHasForex(group)) return inst.value;
-  if (inst.name.endsWith('_xp')) return inst.value;
+  if (inst.name.endsWith("_xp")) return inst.value;
   return inst.value * (1 + moexBiasPercent / 100);
 };
 
@@ -259,9 +272,9 @@ const toStoredValue = (
   displayed: number,
   inst: Instrument,
   group: { instruments: Instrument[] },
-  moexBiasPercent: number
+  moexBiasPercent: number,
 ): number => {
-  if (!groupHasForex(group) || inst.name.endsWith('_xp')) return displayed;
+  if (!groupHasForex(group) || inst.name.endsWith("_xp")) return displayed;
   return displayed / (1 + moexBiasPercent / 100);
 };
 
@@ -280,7 +293,7 @@ const PairCalculator = ({
 }: PairCalculatorProps) => {
   const [instruments, setInstruments] = useState(group.instruments);
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
-  const [editingValue, setEditingValue] = useState('');
+  const [editingValue, setEditingValue] = useState("");
   const hasForex = groupHasForex(group);
 
   const handleChange = (index: number, val: string | number) => {
@@ -305,20 +318,20 @@ const PairCalculator = ({
   const handleFocus = (index: number) => {
     setFocusedIndex(index);
     setEditingValue(
-      formatNumber(getDisplayValue(instruments[index], group, moexBiasPercent))
+      formatNumber(getDisplayValue(instruments[index], group, moexBiasPercent)),
     );
   };
 
   const handleBlur = (index: number) => {
     if (focusedIndex === index) {
-      const normalized = editingValue.replace(',', '.');
+      const normalized = editingValue.replace(",", ".");
       const parsed = parseFloat(normalized);
       if (!Number.isNaN(parsed) && parsed >= 0) {
         const stored = toStoredValue(
           parsed,
           instruments[index],
           group,
-          moexBiasPercent
+          moexBiasPercent,
         );
         handleChange(index, round2(stored));
       }
@@ -326,7 +339,11 @@ const PairCalculator = ({
     }
   };
 
-  const baseDisplayValue = getDisplayValue(instruments[0], group, moexBiasPercent);
+  const baseDisplayValue = getDisplayValue(
+    instruments[0],
+    group,
+    moexBiasPercent,
+  );
   const handleSliderChange = (displayedValues: number[]) => {
     const stored = hasForex
       ? displayedValues[0] / (1 + moexBiasPercent / 100)
@@ -355,7 +372,7 @@ const PairCalculator = ({
                   focusedIndex === index
                     ? editingValue
                     : formatNumber(
-                        getDisplayValue(inst, group, moexBiasPercent)
+                        getDisplayValue(inst, group, moexBiasPercent),
                       )
                 }
                 onChange={(e) =>
@@ -392,7 +409,7 @@ const TripleCalculator = ({
 }: TripleCalculatorProps) => {
   const [instruments, setInstruments] = useState(group.instruments);
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
-  const [editingValue, setEditingValue] = useState('');
+  const [editingValue, setEditingValue] = useState("");
   const hasForex = groupHasForex(group);
 
   const handleChange = (index: number, val: string | number) => {
@@ -417,20 +434,20 @@ const TripleCalculator = ({
   const handleFocus = (index: number) => {
     setFocusedIndex(index);
     setEditingValue(
-      formatNumber(getDisplayValue(instruments[index], group, moexBiasPercent))
+      formatNumber(getDisplayValue(instruments[index], group, moexBiasPercent)),
     );
   };
 
   const handleBlur = (index: number) => {
     if (focusedIndex === index) {
-      const normalized = editingValue.replace(',', '.');
+      const normalized = editingValue.replace(",", ".");
       const parsed = parseFloat(normalized);
       if (!Number.isNaN(parsed) && parsed >= 0) {
         const stored = toStoredValue(
           parsed,
           instruments[index],
           group,
-          moexBiasPercent
+          moexBiasPercent,
         );
         handleChange(index, round2(stored));
       }
@@ -438,7 +455,11 @@ const TripleCalculator = ({
     }
   };
 
-  const baseDisplayValue = getDisplayValue(instruments[0], group, moexBiasPercent);
+  const baseDisplayValue = getDisplayValue(
+    instruments[0],
+    group,
+    moexBiasPercent,
+  );
   const handleSliderChange = (displayedValues: number[]) => {
     const stored = hasForex
       ? displayedValues[0] / (1 + moexBiasPercent / 100)
@@ -467,7 +488,7 @@ const TripleCalculator = ({
                   focusedIndex === index
                     ? editingValue
                     : formatNumber(
-                        getDisplayValue(inst, group, moexBiasPercent)
+                        getDisplayValue(inst, group, moexBiasPercent),
                       )
                 }
                 onChange={(e) =>
@@ -497,6 +518,8 @@ export interface XpbeeRates {
   CNYRate?: number | null;
   GOLDRate?: number | null;
   SilverRate?: number | null;
+  /** Последняя цена фьючерса какао MOEX, ₽/кг */
+  CocoaRate?: number | null;
 }
 
 interface XpbeeCalculatorProps {
@@ -513,25 +536,21 @@ export function XpbeeCalculator({
   const { EURRate, USDRate, CNYRate, GOLDRate, SilverRate } = rates;
 
   const [groups, setGroups] = useState<CalculatorGroup[]>(() =>
-    loadMergedGroups('arbitrageGroups', [...initialPairs, ...initialTriples])
+    loadMergedGroups("arbitrageGroups", [...initialPairs, ...initialTriples]),
   );
 
-  const updateGroup = (
-    groupId: string,
-    updatedInstruments: Instrument[]
-  ) => {
+  const updateGroup = (groupId: string, updatedInstruments: Instrument[]) => {
     setGroups((prev) =>
       prev.map((group) =>
         group.id === groupId
           ? { ...group, instruments: updatedInstruments }
-          : group
-      )
+          : group,
+      ),
     );
   };
 
   useEffect(() => {
-    const hasRates =
-      USDRate != null && CNYRate != null && EURRate != null;
+    const hasRates = USDRate != null && CNYRate != null && EURRate != null;
     const hasGold = GOLDRate != null;
     const hasSilver = SilverRate != null;
     if (!hasRates && !hasGold && !hasSilver) return;
@@ -545,19 +564,16 @@ export function XpbeeCalculator({
         let newInstruments = [...group.instruments];
         let updated = false;
 
-        if (group.id === 'SI/CNY/USDCNH_xp' && usdCny != null) {
+        if (group.id === "SI/CNY/USDCNH_xp" && usdCny != null) {
           newInstruments[1].ratio = usdCny;
           updated = true;
-        } else if (group.id === 'EU/SI/EURUSD_xp' && eurUsd != null) {
+        } else if (group.id === "EU/SI/EURUSD_xp" && eurUsd != null) {
           newInstruments[1].ratio = eurUsd;
           updated = true;
-        } else if (group.id === 'EU/CNY/EURCNH_xp' && eurCny != null) {
+        } else if (group.id === "EU/CNY/EURCNH_xp" && eurCny != null) {
           newInstruments[1].ratio = eurCny;
           updated = true;
-        } else if (
-          group.id === 'GLDRUBF/SI/GOLD' &&
-          GOLDRate != null
-        ) {
+        } else if (group.id === "GLDRUBF/SI/GOLD" && GOLDRate != null) {
           newInstruments[1].ratio = GOLDRate / 1000 / 31.1;
           updated = true;
         }
@@ -573,26 +589,26 @@ export function XpbeeCalculator({
         }
 
         return updated ? { ...group, instruments: newInstruments } : group;
-      })
+      }),
     );
   }, [EURRate, USDRate, CNYRate, GOLDRate, SilverRate]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      localStorage.setItem('arbitrageGroups', JSON.stringify(groups));
+      localStorage.setItem("arbitrageGroups", JSON.stringify(groups));
     }, 500);
     return () => clearTimeout(timeout);
   }, [groups]);
 
   const visibleGroups = useMemo(
     () => filterGroupsBySearch(sortGroupsByMoexLeg(groups), searchQuery),
-    [groups, searchQuery]
+    [groups, searchQuery],
   );
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
-        {visibleGroups.map((group) =>
-        group.type === 'pair' ? (
+      {visibleGroups.map((group) =>
+        group.type === "pair" ? (
           <PairCalculator
             key={group.id}
             group={group}
@@ -606,7 +622,7 @@ export function XpbeeCalculator({
             onUpdate={updateGroup}
             moexBiasPercent={moexBiasPercent}
           />
-        )
+        ),
       )}
     </div>
   );
