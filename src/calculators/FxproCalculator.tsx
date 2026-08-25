@@ -33,6 +33,10 @@ const FXPRO_STORAGE_KEY = "fxproGroups";
 /** 1000 контрактов MOEX COCOA = 1 лот FXPRO #Cocoa */
 const FXPRO_COCOA_LOT_PER_MOEX = 0.001;
 
+/** 375 контрактов MOEX COFFEE = 0.1 лота FXPRO #Coffee */
+const FXPRO_COFFEE_MOEX_LOTS = 375;
+const FXPRO_COFFEE_FXPRO_LOTS = 0.1;
+
 const initialPairs: FxproGroup[] = [
   {
     id: "BR/BRENT",
@@ -106,6 +110,22 @@ const initialPairs: FxproGroup[] = [
       { name: "COCOA", value: 10, ratio: 1 },
       { name: "SI", value: 10, ratio: 1 },
       { name: "#Cocoa", value: 0.01, ratio: 0.001 },
+    ],
+  },
+  {
+    id: "COFFEE/#Coffee",
+    type: "pair",
+    instruments: [
+      {
+        name: "COFFEE",
+        value: FXPRO_COFFEE_MOEX_LOTS,
+        ratio: FXPRO_COFFEE_MOEX_LOTS,
+      },
+      {
+        name: "#Coffee",
+        value: FXPRO_COFFEE_FXPRO_LOTS,
+        ratio: FXPRO_COFFEE_FXPRO_LOTS,
+      },
     ],
   },
 ];
