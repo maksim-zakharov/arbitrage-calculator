@@ -1,10 +1,20 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Slider } from '../components/ui/slider';
-import { Input } from '../components/ui/input';
-import { TypographyH4 } from '../components/ui/typography';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { formatNumber, filterGroupsBySearch, loadMergedGroups, sortGroupsByMoexLeg } from '../utils';
-import { AlorLabel } from './XpbeeCalculator';
+import React, { useEffect, useMemo, useState } from "react";
+import { Slider } from "../components/ui/slider";
+import { Input } from "../components/ui/input";
+import { TypographyH4 } from "../components/ui/typography";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import {
+  formatNumber,
+  filterGroupsBySearch,
+  loadMergedGroups,
+  sortGroupsByMoexLeg,
+} from "../utils";
+import { AlorLabel } from "./XpbeeCalculator";
 
 interface Instrument {
   name: string;
@@ -14,99 +24,115 @@ interface Instrument {
 
 interface HyperliquidPair {
   id: string;
-  type: 'pair';
+  type: "pair";
   instruments: Instrument[];
 }
 
-const HYPERLIQUID_STORAGE_KEY = 'hyperliquidGroups';
+const HYPERLIQUID_STORAGE_KEY = "hyperliquidGroups";
 
 /** Маппинг старых id групп (до перехода на префикс xyz:). */
 const LEGACY_GROUP_ID_MAP: Record<string, string> = {
-  'BR/BRENTOIL-USDC': 'BR/xyz:BRENTOIL',
-  'NG/NATGAS-USDC': 'NG/xyz:NATGAS',
-  'ED/EURUSD-USDC': 'ED/xyz:EURUSD',
-  'GOLD/GOLD-USDC': 'GOLD/xyz:GOLD',
-  'SILV/SILVER-USDC': 'SILV/xyz:SILVER',
-  'PLD/PALLADIUM-USDC': 'PLD/xyz:PALLADIUM',
-  'PLT/PLATINUM-USDC': 'PLT/xyz:PLATINUM',
-  'NASD/XYZ100': 'NASD/xyz:XYZ100',
+  "BR/BRENTOIL-USDC": "BR/xyz:BRENTOIL",
+  "NG/NATGAS-USDC": "NG/xyz:NATGAS",
+  "ED/EURUSD-USDC": "ED/xyz:EURUSD",
+  "GOLD/GOLD-USDC": "GOLD/xyz:GOLD",
+  "SILV/SILVER-USDC": "SILV/xyz:SILVER",
+  "PLD/PALLADIUM-USDC": "PLD/xyz:PALLADIUM",
+  "PLT/PLATINUM-USDC": "PLT/xyz:PLATINUM",
+  "NASD/XYZ100": "NASD/xyz:XYZ100",
 };
 
 /** Маппинг старых имён ног Hyperliquid. */
 const LEGACY_INSTRUMENT_NAME_MAP: Record<string, string> = {
-  'BRENTOIL-USDC': 'xyz:BRENTOIL',
-  'NATGAS-USDC': 'xyz:NATGAS',
-  'EURUSD-USDC': 'xyz:EURUSD',
-  'GOLD-USDC': 'xyz:GOLD',
-  'SILVER-USDC': 'xyz:SILVER',
-  'PALLADIUM-USDC': 'xyz:PALLADIUM',
-  'PLATINUM-USDC': 'xyz:PLATINUM',
-  XYZ100: 'xyz:XYZ100',
+  "BRENTOIL-USDC": "xyz:BRENTOIL",
+  "NATGAS-USDC": "xyz:NATGAS",
+  "EURUSD-USDC": "xyz:EURUSD",
+  "GOLD-USDC": "xyz:GOLD",
+  "SILVER-USDC": "xyz:SILVER",
+  "PALLADIUM-USDC": "xyz:PALLADIUM",
+  "PLATINUM-USDC": "xyz:PLATINUM",
+  XYZ100: "xyz:XYZ100",
 };
 
 const initialPairs: HyperliquidPair[] = [
   {
-    id: 'BR/xyz:BRENTOIL',
-    type: 'pair',
+    id: "BR/xyz:BRENTOIL",
+    type: "pair",
     instruments: [
-      { name: 'BR', value: 1, ratio: 1 },
-      { name: 'xyz:BRENTOIL', value: 10, ratio: 10 },
+      { name: "BR", value: 1, ratio: 1 },
+      { name: "xyz:BRENTOIL", value: 10, ratio: 10 },
     ],
   },
   {
-    id: 'NG/xyz:NATGAS',
-    type: 'pair',
+    id: "NG/xyz:NATGAS",
+    type: "pair",
     instruments: [
-      { name: 'NG', value: 1, ratio: 1 },
-      { name: 'xyz:NATGAS', value: 100, ratio: 100 },
+      { name: "NG", value: 1, ratio: 1 },
+      { name: "xyz:NATGAS", value: 100, ratio: 100 },
     ],
   },
   {
-    id: 'ED/xyz:EURUSD',
-    type: 'pair',
+    id: "ED/xyz:EURUSD",
+    type: "pair",
     instruments: [
-      { name: 'ED', value: 1, ratio: 1 },
-      { name: 'xyz:EURUSD', value: 1000, ratio: 1000 },
+      { name: "ED", value: 1, ratio: 1 },
+      { name: "xyz:EURUSD", value: 1000, ratio: 1000 },
     ],
   },
   {
-    id: 'GOLD/xyz:GOLD',
-    type: 'pair',
+    id: "GOLD/xyz:GOLD",
+    type: "pair",
     instruments: [
-      { name: 'GOLD', value: 1, ratio: 1 },
-      { name: 'xyz:GOLD', value: 1, ratio: 10 },
+      { name: "GOLD", value: 1, ratio: 1 },
+      { name: "xyz:GOLD", value: 1, ratio: 10 },
     ],
   },
   {
-    id: 'SILV/xyz:SILVER',
-    type: 'pair',
+    id: "SILV/xyz:SILVER",
+    type: "pair",
     instruments: [
-      { name: 'SILV', value: 1, ratio: 1 },
-      { name: 'xyz:SILVER', value: 10, ratio: 10 },
+      { name: "SILV", value: 1, ratio: 1 },
+      { name: "xyz:SILVER", value: 10, ratio: 10 },
     ],
   },
   {
-    id: 'PLD/xyz:PALLADIUM',
-    type: 'pair',
+    id: "PLD/xyz:PALLADIUM",
+    type: "pair",
     instruments: [
-      { name: 'PLD', value: 1, ratio: 1 },
-      { name: 'xyz:PALLADIUM', value: 1, ratio: 1 },
+      { name: "PLD", value: 1, ratio: 1 },
+      { name: "xyz:PALLADIUM", value: 1, ratio: 1 },
     ],
   },
   {
-    id: 'PLT/xyz:PLATINUM',
-    type: 'pair',
+    id: "PLT/xyz:PLATINUM",
+    type: "pair",
     instruments: [
-      { name: 'PLT', value: 1, ratio: 1 },
-      { name: 'xyz:PLATINUM', value: 1, ratio: 1 },
+      { name: "PLT", value: 1, ratio: 1 },
+      { name: "xyz:PLATINUM", value: 1, ratio: 1 },
     ],
   },
   {
-    id: 'NASD/xyz:XYZ100',
-    type: 'pair',
+    id: "NASD/xyz:XYZ100",
+    type: "pair",
     instruments: [
-      { name: 'NASD', value: 100, ratio: 1 },
-      { name: 'xyz:XYZ100', value: 1, ratio: 0.01 },
+      { name: "NASD", value: 100, ratio: 1 },
+      { name: "xyz:XYZ100", value: 1, ratio: 0.01 },
+    ],
+  },
+  {
+    id: "BTC/HL:BTC",
+    type: "pair",
+    instruments: [
+      { name: "BTC", value: 1000, ratio: 1000 },
+      { name: "HL:BTC", value: 1, ratio: 1 },
+    ],
+  },
+  {
+    id: "ETH/HL:ETH",
+    type: "pair",
+    instruments: [
+      { name: "ETH", value: 100, ratio: 100 },
+      { name: "HL:ETH", value: 1, ratio: 1 },
     ],
   },
 ];
@@ -140,7 +166,7 @@ const round2 = (n: number): number => Math.round(n * 100) / 100;
 const getDisplayValue = (
   inst: Instrument,
   index: number,
-  moexBiasPercent: number
+  moexBiasPercent: number,
 ): number =>
   index === 0 ? inst.value * (1 + moexBiasPercent / 100) : inst.value;
 
@@ -148,7 +174,7 @@ const getDisplayValue = (
 const toStoredValue = (
   displayed: number,
   index: number,
-  moexBiasPercent: number
+  moexBiasPercent: number,
 ): number =>
   index === 0 ? displayed / (1 + moexBiasPercent / 100) : displayed;
 
@@ -161,7 +187,7 @@ interface PairCardProps {
 function PairCard({ group, onUpdate, moexBiasPercent }: PairCardProps) {
   const [instruments, setInstruments] = useState(group.instruments);
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
-  const [editingValue, setEditingValue] = useState('');
+  const [editingValue, setEditingValue] = useState("");
 
   const handleChange = (index: number, val: string | number) => {
     const value = round2(parseFloat(String(val)));
@@ -185,13 +211,13 @@ function PairCard({ group, onUpdate, moexBiasPercent }: PairCardProps) {
   const handleFocus = (index: number) => {
     setFocusedIndex(index);
     setEditingValue(
-      formatNumber(getDisplayValue(instruments[index], index, moexBiasPercent))
+      formatNumber(getDisplayValue(instruments[index], index, moexBiasPercent)),
     );
   };
 
   const handleBlur = (index: number) => {
     if (focusedIndex === index) {
-      const normalized = editingValue.replace(',', '.');
+      const normalized = editingValue.replace(/\s/g, "").replace(",", ".");
       const parsed = parseFloat(normalized);
       if (!Number.isNaN(parsed) && parsed >= 0) {
         const stored = toStoredValue(parsed, index, moexBiasPercent);
@@ -201,11 +227,7 @@ function PairCard({ group, onUpdate, moexBiasPercent }: PairCardProps) {
     }
   };
 
-  const baseDisplayValue = getDisplayValue(
-    instruments[0],
-    0,
-    moexBiasPercent
-  );
+  const baseDisplayValue = getDisplayValue(instruments[0], 0, moexBiasPercent);
   const handleSliderChange = (values: number[]) => {
     const stored = values[0] / (1 + moexBiasPercent / 100);
     handleChange(0, round2(stored));
@@ -232,7 +254,7 @@ function PairCard({ group, onUpdate, moexBiasPercent }: PairCardProps) {
                   focusedIndex === index
                     ? editingValue
                     : formatNumber(
-                        getDisplayValue(inst, index, moexBiasPercent)
+                        getDisplayValue(inst, index, moexBiasPercent),
                       )
                 }
                 onChange={(e) =>
@@ -248,7 +270,7 @@ function PairCard({ group, onUpdate, moexBiasPercent }: PairCardProps) {
           className="pt-2 pb-2"
           value={[baseDisplayValue]}
           onValueChange={handleSliderChange}
-          max={500}
+          max={Math.max(500, Math.ceil(instruments[0].ratio * 2))}
           step={1}
         />
       </CardContent>
@@ -274,16 +296,13 @@ export function HyperliquidCalculator({
     return loadMergedGroups(HYPERLIQUID_STORAGE_KEY, [...initialPairs]);
   });
 
-  const updateGroup = (
-    groupId: string,
-    updatedInstruments: Instrument[]
-  ) => {
+  const updateGroup = (groupId: string, updatedInstruments: Instrument[]) => {
     setGroups((prev) =>
       prev.map((group) =>
         group.id === groupId
           ? { ...group, instruments: updatedInstruments }
-          : group
-      )
+          : group,
+      ),
     );
   };
 
@@ -296,19 +315,19 @@ export function HyperliquidCalculator({
 
   const visibleGroups = useMemo(
     () => filterGroupsBySearch(sortGroupsByMoexLeg(groups), searchQuery),
-    [groups, searchQuery]
+    [groups, searchQuery],
   );
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
-        {visibleGroups.map((group) => (
-          <PairCard
-            key={group.id}
-            group={group}
-            onUpdate={updateGroup}
-            moexBiasPercent={moexBiasPercent}
-          />
-        ))}
+      {visibleGroups.map((group) => (
+        <PairCard
+          key={group.id}
+          group={group}
+          onUpdate={updateGroup}
+          moexBiasPercent={moexBiasPercent}
+        />
+      ))}
     </div>
   );
 }
