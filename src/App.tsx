@@ -1,11 +1,15 @@
 import React from "react";
-import {ArbitrageCalculator} from "./ArbitrageCalculator";
-import './index.css'
-import {ThemeProvider} from "./components/theme-provider";
+import { ArbitrageCalculator } from "./ArbitrageCalculator";
+import "./index.css";
+import { ThemeProvider } from "./components/theme-provider";
+import { useAppVersionAutoReload } from "./hooks/useAppVersionAutoReload";
 
-export default function App(){
+export default function App() {
+  useAppVersionAutoReload();
 
-    return <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-        <ArbitrageCalculator />
+  return (
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <ArbitrageCalculator />
     </ThemeProvider>
+  );
 }
