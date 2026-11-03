@@ -257,10 +257,11 @@ const initialTriples: CalculatorGroup[] = [
   {
     id: "SLVRUBF/SI/SILV",
     type: "triple",
+    /** ~20 oz: 622 г SLVRUBF / SI / 200 SILV при SilverRate≈50 */
     instruments: [
-      { name: "SLVRUBF", value: 31.1, ratio: 1 },
+      { name: "SLVRUBF", value: 622, ratio: 1 },
       { name: "SI", value: 0, ratio: 0 },
-      { name: "SILV", value: 1, ratio: 1 / 31.1 },
+      { name: "SILV", value: 200, ratio: 10 / 31.1 },
     ],
   },
 ];
@@ -587,7 +588,9 @@ export function XpbeeCalculator({
           newInstruments[1].ratio = GOLDRate / 1000 / 31.1;
           updated = true;
         } else if (group.id === "SLVRUBF/SI/SILV" && SilverRate != null) {
-          newInstruments[1].ratio = SilverRate / 1000 / 31.1;
+          /** SI ×100 к формуле золота; SILV = 10 лотов на унцию (622→200). */
+          newInstruments[1].ratio = (SilverRate / 1000 / 31.1) * 100;
+          newInstruments[2].ratio = 10 / 31.1;
           updated = true;
         }
 
