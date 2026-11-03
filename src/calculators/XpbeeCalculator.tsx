@@ -20,6 +20,7 @@ const moexIconMap: Record<string, string> = {
   GOLD: "GoldFut2",
   GLDRUBF: "GoldFut2",
   SILV: "SilverFut",
+  SLVRUBF: "SilverFut",
   PLD: "Palladium",
   PLT: "Platinum",
   UCNY: "USDCNY",
@@ -251,6 +252,15 @@ const initialTriples: CalculatorGroup[] = [
       { name: "GLDRUBF", value: 31.1, ratio: 1 },
       { name: "SI", value: 0, ratio: 0 },
       { name: "GOLD", value: 1, ratio: 1 / 31.1 },
+    ],
+  },
+  {
+    id: "SLVRUBF/SI/SILV",
+    type: "triple",
+    instruments: [
+      { name: "SLVRUBF", value: 31.1, ratio: 1 },
+      { name: "SI", value: 0, ratio: 0 },
+      { name: "SILV", value: 1, ratio: 1 / 31.1 },
     ],
   },
 ];
@@ -575,6 +585,9 @@ export function XpbeeCalculator({
           updated = true;
         } else if (group.id === "GLDRUBF/SI/GOLD" && GOLDRate != null) {
           newInstruments[1].ratio = GOLDRate / 1000 / 31.1;
+          updated = true;
+        } else if (group.id === "SLVRUBF/SI/SILV" && SilverRate != null) {
+          newInstruments[1].ratio = SilverRate / 1000 / 31.1;
           updated = true;
         }
 

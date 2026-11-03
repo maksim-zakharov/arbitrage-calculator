@@ -1,20 +1,42 @@
-import * as React from "react"
+import * as React from 'react';
 
-import { cn } from "../../utils"
+import { cn } from '../../utils';
+import { cva, type VariantProps } from 'class-variance-authority';
 
-function Input({ className, type, ...props }: React.ComponentProps<"input">) {
+const inputVariants = cva(
+  'file:text-foreground placeholder:text-[color:var(--placeholder)] selection:bg-primary selection:text-primary-foreground flex w-full min-w-0 border border-solid border-input bg-input px-3 py-1 text-base outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm transition-[color,box-shadow] focus-visible:border-primary aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]',
+  {
+    variants: {
+      variant: {
+        default: '',
+      },
+      size: {
+        /** Стандарт: 40px, фон/бордер --input (BDS gray-ele-line), radius 4px */
+        default: 'h-10 rounded-[var(--size-4,4px)]',
+        xs: 'h-5 rounded text-[11px] gap-1.5 px-2 has-[>svg]:px-2.5',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      size: 'default',
+    },
+  },
+);
+
+const Input = React.forwardRef<
+  HTMLInputElement,
+  Omit<React.ComponentProps<'input'>, 'size'> & VariantProps<typeof inputVariants>
+>(({ className, type, variant, size, ...props }, ref) => {
   return (
     <input
+      ref={ref}
       type={type}
       data-slot="input"
-      className={cn(
-        "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground bg-[var(--app-input)] border border-border h-9 w-full min-w-0 rounded-md px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus:border-input-focus focus:ring-0 focus-visible:border-input-focus focus-visible:ring-0",
-        "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
-        className
-      )}
+      className={cn(inputVariants({ variant, size, className }))}
       {...props}
     />
-  )
-}
+  );
+});
+Input.displayName = 'Input';
 
-export { Input }
+export { Input };

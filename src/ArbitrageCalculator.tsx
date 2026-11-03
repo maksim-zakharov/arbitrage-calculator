@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { GroupSearchInput } from "./components/GroupSearchInput";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
+import { Tabs, TabsContent } from "./components/ui/tabs";
+import {
+  UnderlineTabsList,
+  UnderlineTabsTrigger,
+} from "./components/ui/underline-tabs";
+import { Card, CardContent } from "./components/ui/card";
 import { TypographyH3 } from "./components/ui/typography";
 import { Slider } from "./components/ui/slider";
 import { getCocoaFuturesSecid, getFuturesSuffix, moneyFormat } from "./utils";
@@ -193,7 +198,7 @@ export function ArbitrageCalculator() {
     <>
       <div className="flex flex-col h-dvh pb-[env(safe-area-inset-bottom)]">
         <a
-          className="shrink-0 block w-full border-b border-black/10 bg-white px-3 py-2 text-xs sm:text-sm text-center text-black hover:bg-neutral-100 transition-colors pt-[max(0.5rem,env(safe-area-inset-top))]"
+          className="shrink-0 block w-full border-b border-primary/20 bg-primary px-3 py-2 text-xs sm:text-sm text-center text-black hover:bg-primary/90 transition-colors pt-[max(0.5rem,env(safe-area-inset-top))]"
           href="https://crypto-spreads.com/?utm_source=calculator&utm_medium=link&utm_campaign=xpbee"
           target="_blank"
           rel="noopener noreferrer"
@@ -201,49 +206,76 @@ export function ArbitrageCalculator() {
           Скринер с котировками XPBEE —{" "}
           <span className="underline">попробовать сейчас</span>
         </a>
-        <main className="flex flex-col flex-1 min-h-0 gap-3 px-3 sm:px-4">
-          <div className="pt-2">
-            <RatesTicker
-              EURRate={EURRate}
-              USDRate={USDRate}
-              CNYRate={CNYRate}
-              GOLDRate={GOLDRate}
-              SilverRate={SilverRate}
-              CocoaRate={CocoaRate}
-            />
-          </div>
-          <TypographyH3 as="h1">Калькулятор лотности</TypographyH3>
-          <div className="flex flex-col кам py-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
-            <span className="text-sm font-medium">Перевес на MOEX, %</span>
-            <div className="flex items-center gap-3 w-full sm:flex-1 sm:min-w-0">
-              <Slider
-                className="flex-1"
-                value={[moexBiasPercent]}
-                onValueChange={(v) => setMoexBiasPercent(v[0])}
-                min={0}
-                max={20}
-                step={1}
-                marks={[5, 10, 15, 20]}
+        <main className="flex flex-col flex-1 min-h-0 gap-1 px-1 sm:px-2 pt-2 pb-3">
+          <Card className="shrink-0 gap-3 rounded py-3 shadow-none">
+            <CardContent className="flex flex-col gap-3 px-3 sm:px-4">
+              <RatesTicker
+                EURRate={EURRate}
+                USDRate={USDRate}
+                CNYRate={CNYRate}
+                GOLDRate={GOLDRate}
+                SilverRate={SilverRate}
+                CocoaRate={CocoaRate}
               />
-              <span className="shrink-0 text-sm text-muted-foreground min-w-[3rem] text-right">
-                {Math.round(moexBiasPercent)}%
-              </span>
-            </div>
-          </div>
+              <TypographyH3 as="h1">Калькулятор лотности</TypographyH3>
+            </CardContent>
+          </Card>
+
           <Tabs
             value={tab}
             onValueChange={(value) => isValidTab(value) && setTab(value)}
-            className="flex flex-col flex-1 min-h-0 min-w-0"
+            className="flex flex-col flex-1 min-h-0 min-w-0 gap-1"
           >
-            <div className="sticky top-0 z-20 -mx-3 sm:-mx-4 shrink-0 bg-background px-3 sm:px-4 pb-0 flex flex-col gap-1">
-              <TabsList className="shrink-0">
-                <TabsTrigger value="xpbee">XPBEE</TabsTrigger>
-                <TabsTrigger value="fxpro">FXPRO</TabsTrigger>
-                <TabsTrigger value="hyperliquid">Hyperliquid</TabsTrigger>
-              </TabsList>
-              <GroupSearchInput value={searchQuery} onChange={setSearchQuery} />
-            </div>
-            <TabsContent value="xpbee" className="flex-1 min-h-0 overflow-auto">
+            <Card className="shrink-0 gap-2 rounded pt-3 pb-0 shadow-none">
+              <CardContent className="flex flex-col gap-2 px-3 sm:px-4 pb-0">
+                <div className="flex flex-col gap-2 py-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+                  <span className="text-sm font-medium">Перевес на MOEX, %</span>
+                  <div className="flex items-center gap-3 w-full sm:flex-1 sm:min-w-0">
+                    <Slider
+                      className="flex-1"
+                      value={[moexBiasPercent]}
+                      onValueChange={(v) => setMoexBiasPercent(v[0])}
+                      min={0}
+                      max={20}
+                      step={1}
+                      marks={[5, 10, 15, 20]}
+                    />
+                    <span className="shrink-0 text-sm text-muted-foreground min-w-[3rem] text-right">
+                      {Math.round(moexBiasPercent)}%
+                    </span>
+                  </div>
+                </div>
+                <GroupSearchInput
+                  value={searchQuery}
+                  onChange={setSearchQuery}
+                />
+                <UnderlineTabsList className="shrink-0 justify-stretch gap-0 sm:justify-start sm:gap-4">
+                  <UnderlineTabsTrigger
+                    value="xpbee"
+                    className="flex flex-1 justify-center sm:flex-none sm:justify-start"
+                  >
+                    XPBEE
+                  </UnderlineTabsTrigger>
+                  <UnderlineTabsTrigger
+                    value="fxpro"
+                    className="flex flex-1 justify-center sm:flex-none sm:justify-start"
+                  >
+                    FXPRO
+                  </UnderlineTabsTrigger>
+                  <UnderlineTabsTrigger
+                    value="hyperliquid"
+                    className="flex flex-1 justify-center sm:flex-none sm:justify-start"
+                  >
+                    Hyperliquid
+                  </UnderlineTabsTrigger>
+                </UnderlineTabsList>
+              </CardContent>
+            </Card>
+
+            <TabsContent
+              value="xpbee"
+              className="flex-1 min-h-0 overflow-auto mt-0"
+            >
               <XpbeeCalculator
                 rates={{
                   EURRate,
@@ -257,7 +289,10 @@ export function ArbitrageCalculator() {
                 searchQuery={searchQuery}
               />
             </TabsContent>
-            <TabsContent value="fxpro" className="flex-1 min-h-0 overflow-auto">
+            <TabsContent
+              value="fxpro"
+              className="flex-1 min-h-0 overflow-auto mt-0"
+            >
               <FxproCalculator
                 rates={{
                   EURRate,
@@ -273,7 +308,7 @@ export function ArbitrageCalculator() {
             </TabsContent>
             <TabsContent
               value="hyperliquid"
-              className="flex-1 min-h-0 overflow-auto"
+              className="flex-1 min-h-0 overflow-auto mt-0"
             >
               <HyperliquidCalculator
                 moexBiasPercent={moexBiasPercent}

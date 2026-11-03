@@ -12,17 +12,19 @@
     --app-muted: #161619;
     --app-muted-fg: #9aa3a8;
     --app-border: #25282c;
-    --app-input: #25282c;
+    /** Bybit BDS: --bds-gray-ele-line (как в smartmoney-client) */
+    --bds-gray-ele-line: #222227;
+    --app-input: var(--bds-gray-ele-line);
     --app-input-focus: #428bf9;
     --app-secondary: #161619;
     --app-accent: #161619;
-    --app-primary: #eceeef;
+    --app-primary: #ff9c2e;
     --app-primary-fg: #000000;
     --app-ring: #4a5560;
-    --app-banner-bg: #ffffff;
+    --app-banner-bg: var(--app-primary);
     --app-banner-fg: #000000;
     --app-banner-border: rgb(0 0 0 / 0.1);
-    --app-banner-hover: #f5f5f5;
+    --app-banner-hover: color-mix(in srgb, var(--app-primary) 90%, black);
     --app-slider-thumb: #ffffff;
     --app-shadow: rgb(0 0 0 / 0.4);
     --app-shadow-strong: rgb(0 0 0 / 0.45);
@@ -49,6 +51,13 @@
     --destructive-foreground: oklch(0.577 0.245 27.325);
     --border: oklch(0.922 0 0);
     --input: oklch(0.922 0 0);
+    --placeholder: oklch(0.556 0 0);
+    --size-4: 4px;
+    /** Скроллбар: ширина и цвет ползунка (от --muted-foreground) */
+    --scrollbar-size: 5px;
+    --scrollbar-thumb: color-mix(in srgb, var(--muted-foreground) 40%, transparent);
+    --scrollbar-thumb-hover: color-mix(in srgb, var(--muted-foreground) 60%, transparent);
+    --scrollbar-thumb-active: color-mix(in srgb, var(--muted-foreground) 80%, transparent);
     --ring: oklch(0.708 0 0);
     --chart-1: oklch(0.646 0.222 41.116);
     --chart-2: oklch(0.6 0.118 184.704);
@@ -84,6 +93,7 @@
     --destructive-foreground: oklch(0.637 0.237 25.331);
     --border: var(--app-border);
     --input: var(--app-input);
+    --placeholder: #4a4a4a;
     --ring: var(--app-ring);
     --chart-1: oklch(0.488 0.243 264.376);
     --chart-2: oklch(0.696 0.17 162.48);
@@ -216,5 +226,54 @@
 
     .telegram-fab {
         animation: none;
+    }
+}
+
+/* Единые настройки скроллбара (как в smartmoney-client) */
+*::-webkit-scrollbar {
+    width: var(--scrollbar-size);
+    height: var(--scrollbar-size);
+}
+
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 2px;
+    transition: background 0.2s ease;
+}
+
+*:hover::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb-hover);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-active);
+}
+
+.overflow-y-auto,
+.overflow-y-scroll,
+.overflow-auto,
+.overflow-x-auto,
+.overflow-x-scroll,
+.overflow {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+    scrollbar-gutter: auto;
+}
+
+.overflow-y-auto,
+.overflow-y-scroll,
+.overflow-auto {
+    overflow-y: overlay;
+}
+
+@supports not (overflow: overlay) {
+    .overflow-y-auto,
+    .overflow-y-scroll,
+    .overflow-auto {
+        overflow-y: auto;
     }
 }

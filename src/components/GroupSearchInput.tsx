@@ -1,5 +1,6 @@
-import { X } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { Input } from './ui/input';
+import { cn } from '../utils';
 
 interface GroupSearchInputProps {
   /** Текущий поисковый запрос */
@@ -11,12 +12,13 @@ interface GroupSearchInputProps {
 export function GroupSearchInput({ value, onChange }: GroupSearchInputProps) {
   return (
     <div className="relative">
+      <Search className="pointer-events-none absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
       <Input
         type="text"
         placeholder="Поиск по тикеру, например GOLD"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={value ? 'pr-9' : undefined}
+        className={cn('pl-9', value ? 'pr-9' : undefined)}
       />
       {value ? (
         <button
