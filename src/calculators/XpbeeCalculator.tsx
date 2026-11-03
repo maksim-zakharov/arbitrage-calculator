@@ -587,8 +587,7 @@ export function XpbeeCalculator({
           newInstruments[1].ratio = GOLDRate / 1000 / 31.1;
           updated = true;
         } else if (group.id === "SLVRUBF/SI/SILV" && SilverRate != null) {
-          /** SI ×100 относительно формулы золота (контракт SLVRUBF). */
-          newInstruments[1].ratio = (SilverRate / 1000 / 31.1) * 100;
+          newInstruments[1].ratio = SilverRate / 1000 / 31.1;
           updated = true;
         }
 
